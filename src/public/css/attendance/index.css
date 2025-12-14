@@ -1,0 +1,115 @@
+body {
+    background-color: #F0EFF2;
+}
+
+.attendance-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 229px;
+    padding: 0;
+}
+
+.attendance-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 40px;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #696969;
+    border-radius: 50px;
+    background-color: #C8C8C8;
+    margin-bottom: 32px;
+}
+
+.attendance-date {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+    font-size: 40px;
+    line-height: 1;
+    letter-spacing: 0;
+    text-align: center;
+    color: #000000;
+    margin: 0 0 40px 0;
+}
+
+.attendance-time {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    font-size: 80px;
+    line-height: 1;
+    letter-spacing: 0;
+    color: #000000;
+    margin: 0 0 64px 0;
+}
+
+.attendance-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 90px;
+    margin-top: 40px;
+}
+
+.attendance-buttons form {
+    margin: 0;
+}
+
+.attendance-start-button,
+.attendance-end-button,
+.attendance-break-in-button,
+.attendance-break-out-button {
+    width: 221px;
+    height: 77px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+}
+
+.attendance-start-button:hover,
+.attendance-end-button:hover,
+.attendance-break-in-button:hover,
+.attendance-break-out-button:hover {
+    opacity: 0.8;
+}
+
+.attendance-start-button,
+.attendance-end-button {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.attendance-break-in-button,
+.attendance-break-out-button {
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+.attendance-finished-message {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #000000;
+    display: inline-block;
+    margin: 0;
+}
+.attendance-page.center {
+    width: 100%;
+    padding: 0;
+}
