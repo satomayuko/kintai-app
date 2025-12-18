@@ -181,8 +181,73 @@ class AttendanceController extends Controller
         return redirect()->route('attendance.index');
     }
 
-    public function list()
-    {
-        return view('attendance.list');
+    public function list(Request $request)
+{
+    $user = Auth::user();
+
+    // ?month=2023-06 みたいなクエリを受け取る想定
+    $monthParam = $request->query('month');
+
+    if ($monthParam) {
+        try {
+            // "Y-m" フォーマットで受け取る（例: 2023-06）
+            $currentMonth = Carbon::createFromFormat('Y-m', $monthParam)->startOfMonth();
+        } catch (\Exception $e) {
+            // 変な値が来たときは今月に戻す
+            $currentMonth = Carbon::today()->startOfMonth();
+        }
+    } else {
+        // 指定が無ければ今月
+        $currentMonth = Carbon::today()->startOfMonth();
     }
+
+    $prevMonth = $currentMonth->copy()->subMonth();
+    $nextMonth = $currentMonth->copy()->addMonth();
+
+    $startDate = $currentMonth->copy()->startOfMonth();
+    $endDate   = $currentMonth->copy()->endOfMonth();
+
+    // 選択中の月だけを取得（Figma の 2023/06 一覧のイメージ）
+    $attendances = Attendance::where('user_id', $user->id)
+        ->whereBetween('work_date', [$startDate, $endDate])
+        ->orderBy('work_date')
+        ->get();
+
+    return view('attendance.list', [
+        'attendances'  => $attendances,
+        'currentMonth' => $currentMonth,
+        'prevMonth'    => $prevMonth,
+        'nextMonth'    => $nextMonth,
+    ]);
+}
+public function detail($id)
+{
+    $user = Auth::user();
+
+    $attendance = Attendance::where('id', $id)
+        ->where('user_id', $user->id)
+        ->firstOrFail();
+
+    $weeks = ['日', '月', '火', '水', '木', '金', '土'];
+        $date  = Carbon::parse($attendance->work_date);
+        $week  = $weeks[$date->dayOfWeek];
+
+        // 休憩（最大2つ表示する想定）
+        $breaks = DB::table('breaks')
+            ->where('attendance_id', $attendance->id)
+            ->orderBy('break_start')
+            ->get();
+
+        $break1 = $breaks[0] ?? null;
+        $break2 = $breaks[1] ?? null;
+
+    return view('attendance.detail', [
+        'attendance' => $attendance,
+        'user'      => $user,
+        'date'      => $date,
+        'week'      => $week,
+        'break1'    => $break1,
+        'break2'    => $break2,
+    ]);
+}
 }

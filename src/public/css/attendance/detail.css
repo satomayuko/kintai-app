@@ -1,0 +1,180 @@
+body {
+    background-color: #F0EFF2;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+.attendance-detail-page {
+    display: flex;
+    justify-content: center;
+    padding-top: 120px;
+    padding-bottom: 80px;
+}
+
+.attendance-detail-inner {
+    width: 900px;
+}
+
+.attendance-detail-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.attendance-detail-title-line {
+    width: 8px;
+    height: 40px;
+    background-color: #000000;
+    border-radius: 4px;
+    margin-right: 16px;
+}
+
+.attendance-detail-title-text {
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1;
+    color: #000000;
+}
+
+.attendance-detail-card {
+    width: 900px;
+    height: 555px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 0;
+    overflow: hidden;
+}
+
+.attendance-detail-row {
+    display: flex;
+    align-items: center;
+    height: 90px;
+    padding: 0 64px;
+    border-bottom: 2px solid #E1E1E1;
+    box-sizing: border-box;
+}
+
+.attendance-detail-row--remark {
+    height: 110px;
+    border-bottom: none;
+}
+
+.attendance-detail-label {
+    width: 269px;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #737373;
+}
+
+.attendance-detail-value {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #000000;
+}
+
+/* 日付（時刻欄と完全一致） */
+.attendance-detail-value--date {
+    display: flex;
+    align-items: center;
+}
+
+.date-year,
+.date-day {
+    width: 103px;
+    text-align: center;
+}
+
+.date-spacer {
+    width: 110px;
+}
+
+/* 時刻 */
+.attendance-detail-value--time-range {
+    display: flex;
+    align-items: center;
+}
+
+.time-box {
+    width: 103px;
+    height: 28px;
+    border-radius: 4px;
+    border: 1px solid #E1E1E1;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #000000;
+}
+
+.time-box:first-child {
+    margin-right: 51px;
+}
+
+.time-separator {
+    margin-right: 43px;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #000000;
+}
+
+/* 備考 */
+.attendance-detail-remark-box {
+    width: 316px;
+    height: 72px;
+    border-radius: 4px;
+    border: 1px solid #D9D9D9;
+    box-sizing: border-box;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.attendance-detail-remark-text {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #000000;
+    word-break: break-all;
+}
+
+/* 修正ボタン */
+.attendance-detail-footer {
+    width: 900px;
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.attendance-detail-edit-button {
+    width: 130px;
+    height: 50px;
+    border-radius: 5px;
+    background-color: #000000;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.attendance-detail-edit-button:hover {
+    opacity: 0.8;
+}
