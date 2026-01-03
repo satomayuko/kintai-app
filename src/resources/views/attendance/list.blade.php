@@ -74,11 +74,11 @@
                     </div>
 
                     <div class="cell cell--time">
-                        {{ $attendance->break_time_for_display ?? '' }}
+                        {{ $attendance->break_time_display ?? '' }}
                     </div>
 
                     <div class="cell cell--time">
-                        {{ $attendance->work_time_for_display ?? '' }}
+                        {{ $attendance->work_time_display ?? '' }}
                     </div>
 
                     <div class="cell cell--detail">

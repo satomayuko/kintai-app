@@ -4,11 +4,13 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Http\Requests\LoginRequest;
+use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Fortify;
@@ -23,23 +25,31 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::createUsersUsing(CreateNewUser::class);
 
-        Fortify::registerView(function () {
-            return view('auth.register');
-        });
+        Fortify::registerView(fn () => view('auth.register'));
 
         Fortify::loginView(function () {
-            return view('auth.login');
+            return request()->is('admin/*')
+                ? view('admin.auth.login')
+                : view('auth.login');
         });
 
-        Fortify::authenticateUsing(function ($request) {
+        Fortify::authenticateUsing(function (Request $request) {
+            $form = new LoginRequest();
 
-            $loginRequest = app(\App\Http\Requests\LoginRequest::class);
-            $loginRequest->validateResolved();
+            Validator::make(
+                $request->all(),
+                $form->rules(),
+                $form->messages()
+            )->validate();
 
-            $user = User::where('email', $request->email)->first();
+            $isAdmin = $request->is('admin/*');
 
-            if ($user && Hash::check($request->password, $user->password)) {
-                return $user;
+            $account = ($isAdmin ? Admin::query() : User::query())
+                ->where('email', $request->email)
+                ->first();
+
+            if ($account && Hash::check($request->password, $account->password)) {
+                return $account;
             }
 
             throw ValidationException::withMessages([

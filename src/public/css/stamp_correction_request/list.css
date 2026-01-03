@@ -1,0 +1,127 @@
+.request-list-page {
+    background: #F0EFF2;
+    min-height: 100vh;
+    padding: 80px 0 120px;
+}
+
+.request-list-container {
+    width: 900px;
+    margin: 0 auto;
+}
+
+.request-list-title {
+    display: flex;
+    align-items: center;
+    gap: 21px;
+}
+
+.request-list-title-bar {
+    width: 8px;
+    height: 40px;
+    background: #000000;
+    display: block;
+}
+
+.request-list-title-text {
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1;
+    color: #000000;
+    margin: 0;
+}
+
+.request-list-tabs {
+    display: flex;
+    align-items: center;
+    gap: 106px;
+    margin-top: 72px;
+}
+
+.request-list-tab {
+    font-family: Inter, sans-serif;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #000000;
+    text-decoration: none;
+    font-weight: 400;
+    padding-bottom: 18px;
+}
+
+.request-list-tab.is-active {
+    font-weight: 700;
+}
+
+.request-list-tabs-line {
+    width: 900px;
+    height: 1px;
+    background: #000000;
+    margin-top: -2px;
+}
+
+.request-list-table-wrap {
+    margin-top: 45px;
+}
+
+.request-list-table {
+    width: 900px;
+    border-collapse: collapse;
+    background: #FFFFFF;
+    border: 1px solid #E1E1E1;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.request-list-th {
+    height: 32px;
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #737373;
+    text-align: center;
+    padding: 14px 8px;
+    border-bottom: 3px solid #E1E1E1;
+    background: #FFFFFF;
+}
+
+.request-list-td {
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    color: #737373;
+    text-align: center;
+    padding: 14px 8px;
+    border-bottom: 2px solid #E1E1E1;
+    letter-spacing: 0.15em;
+}
+
+.request-list-td--date {
+    letter-spacing: 0;
+}
+
+.request-list-td--detail {
+    letter-spacing: 0.15em;
+}
+
+.request-list-detail-link {
+    color: #000000;
+    text-decoration: none;
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+}
+
+.request-list-tr:last-child .request-list-td {
+    border-bottom: none;
+}
+
+.request-list-td--empty {
+    padding: 28px 8px;
+    letter-spacing: 0;
+}

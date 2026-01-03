@@ -79,7 +79,6 @@ body {
     color: #000000;
 }
 
-/* 日付（時刻欄と完全一致） */
 .attendance-detail-value--date {
     display: flex;
     align-items: center;
@@ -95,10 +94,44 @@ body {
     width: 110px;
 }
 
-/* 時刻 */
+/* ===== 時刻（表示/入力）をFigma通りに中央固定 ===== */
+
+/* 3点セット(開始/〜/終了)の“箱”を316pxに固定して中央寄せ */
 .attendance-detail-value--time-range {
     display: flex;
     align-items: center;
+    width: 316px;
+    /* 103 + 110 + 103 */
+    margin: 0 auto;
+    /* これで中央寄せが確実 */
+}
+
+/* 左右の時刻は固定幅 */
+.time-box,
+.time-text {
+    flex: 0 0 103px;
+    width: 103px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 「〜」は固定幅で中央 */
+.time-separator {
+    flex: 0 0 110px;
+    width: 110px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #000000;
+}
+
+/* もしBladeに time-text--start が残っててもズレないよう保険 */
+.time-text--start {
+    margin-right: 0 !important;
 }
 
 .time-box {
@@ -110,6 +143,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.time-text {
+    width: 103px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-weight: 700;
     font-size: 16px;
     line-height: 1;
@@ -117,12 +158,16 @@ body {
     color: #000000;
 }
 
-.time-box:first-child {
-    margin-right: 51px;
-}
-
-.time-separator {
-    margin-right: 43px;
+.attendance-detail-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    text-align: center;
     font-weight: 700;
     font-size: 16px;
     line-height: 1;
@@ -130,7 +175,27 @@ body {
     color: #000000;
 }
 
-/* 備考 */
+.attendance-detail-input:focus {
+    outline: none;
+}
+
+.time-box input[type="time"] {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 0;
+}
+
+.time-box input[type="time"]::-webkit-calendar-picker-indicator {
+    display: none;
+    opacity: 0;
+}
+
+.time-box input[type="time"]::-webkit-inner-spin-button,
+.time-box input[type="time"]::-webkit-clear-button {
+    display: none;
+    -webkit-appearance: none;
+}
+
 .attendance-detail-remark-box {
     width: 316px;
     height: 72px;
@@ -142,16 +207,39 @@ body {
     align-items: flex-start;
 }
 
-.attendance-detail-remark-text {
+.attendance-detail-textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    resize: none;
     font-weight: 700;
     font-size: 14px;
-    line-height: 1;
+    line-height: 1.4;
     letter-spacing: 0.15em;
     color: #000000;
-    word-break: break-all;
 }
 
-/* 修正ボタン */
+.attendance-detail-textarea:focus {
+    outline: none;
+}
+
+.attendance-detail-remark-text {
+    width: 316px;
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.4;
+    letter-spacing: 0.15em;
+    color: #000000;
+}
+
 .attendance-detail-footer {
     width: 900px;
     margin-top: 32px;
@@ -173,8 +261,21 @@ body {
     letter-spacing: 0.15em;
     color: #ffffff;
     text-decoration: none;
+    border: none;
+    cursor: pointer;
 }
 
 .attendance-detail-edit-button:hover {
     opacity: 0.8;
+}
+
+.attendance-detail-warning {
+    width: 900px;
+    margin: 20px 0 0 auto;
+    text-align: right;
+    color: #FF0000;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    letter-spacing: 0.15em;
 }

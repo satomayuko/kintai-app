@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\StampCorrectionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,12 +20,12 @@ class AttendanceController extends Controller
             ->whereDate('work_date', $today)
             ->first();
 
-        $status       = '勤務外';
-        $canStart     = false;
-        $canEnd       = false;
-        $canBreakIn   = false;
-        $canBreakOut  = false;
-        $finished     = false;
+        $status      = '勤務外';
+        $canStart    = false;
+        $canEnd      = false;
+        $canBreakIn  = false;
+        $canBreakOut = false;
+        $finished    = false;
 
         if (! $attendance) {
             $canStart = true;
@@ -182,72 +183,115 @@ class AttendanceController extends Controller
     }
 
     public function list(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    // ?month=2023-06 みたいなクエリを受け取る想定
-    $monthParam = $request->query('month');
+        $monthParam = $request->query('month');
 
-    if ($monthParam) {
-        try {
-            // "Y-m" フォーマットで受け取る（例: 2023-06）
-            $currentMonth = Carbon::createFromFormat('Y-m', $monthParam)->startOfMonth();
-        } catch (\Exception $e) {
-            // 変な値が来たときは今月に戻す
+        if ($monthParam) {
+            try {
+                $currentMonth = Carbon::createFromFormat('Y-m', $monthParam)->startOfMonth();
+            } catch (\Exception $e) {
+                $currentMonth = Carbon::today()->startOfMonth();
+            }
+        } else {
             $currentMonth = Carbon::today()->startOfMonth();
         }
-    } else {
-        // 指定が無ければ今月
-        $currentMonth = Carbon::today()->startOfMonth();
+
+        $prevMonth = $currentMonth->copy()->subMonth();
+        $nextMonth = $currentMonth->copy()->addMonth();
+
+        $startDate = $currentMonth->copy()->startOfMonth();
+        $endDate   = $currentMonth->copy()->endOfMonth();
+
+        $attendances = Attendance::where('user_id', $user->id)
+            ->whereBetween('work_date', [$startDate, $endDate])
+            ->orderBy('work_date')
+            ->get();
+
+        $attendanceIds = $attendances->pluck('id');
+
+        $breakSecondsByAttendance = DB::table('breaks')
+            ->select('attendance_id', DB::raw('SUM(TIMESTAMPDIFF(SECOND, break_start, break_end)) as break_seconds'))
+            ->whereIn('attendance_id', $attendanceIds)
+            ->whereNotNull('break_end')
+            ->groupBy('attendance_id')
+            ->pluck('break_seconds', 'attendance_id');
+
+        $attendances->each(function ($attendance) use ($breakSecondsByAttendance) {
+            $breakSeconds = (int) $breakSecondsByAttendance->get($attendance->id, 0);
+            $breakMinutes = $breakSeconds > 0 ? (int) ceil($breakSeconds / 60) : 0;
+
+            if ($breakMinutes > 0) {
+                $breakHours = intdiv($breakMinutes, 60);
+                $breakRemainMinutes = $breakMinutes % 60;
+                $attendance->break_time_display = sprintf('%d:%02d', $breakHours, $breakRemainMinutes);
+            } else {
+                $attendance->break_time_display = '';
+            }
+
+            if ($attendance->start_time && $attendance->end_time) {
+                $workSeconds = Carbon::parse($attendance->end_time)->diffInSeconds(Carbon::parse($attendance->start_time));
+                $workMinutes = (int) floor($workSeconds / 60) - $breakMinutes;
+                if ($workMinutes < 0) {
+                    $workMinutes = 0;
+                }
+
+                if ($workMinutes > 0) {
+                    $workHours = intdiv($workMinutes, 60);
+                    $workRemainMinutes = $workMinutes % 60;
+                    $attendance->work_time_display = sprintf('%d:%02d', $workHours, $workRemainMinutes);
+                } else {
+                    $attendance->work_time_display = '';
+                }
+            } else {
+                $attendance->work_time_display = '';
+            }
+        });
+
+        return view('attendance.list', [
+            'attendances'  => $attendances,
+            'currentMonth' => $currentMonth,
+            'prevMonth'    => $prevMonth,
+            'nextMonth'    => $nextMonth,
+        ]);
     }
 
-    $prevMonth = $currentMonth->copy()->subMonth();
-    $nextMonth = $currentMonth->copy()->addMonth();
+    public function detail($id)
+    {
+        $user = Auth::user();
 
-    $startDate = $currentMonth->copy()->startOfMonth();
-    $endDate   = $currentMonth->copy()->endOfMonth();
+        $attendance = Attendance::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
 
-    // 選択中の月だけを取得（Figma の 2023/06 一覧のイメージ）
-    $attendances = Attendance::where('user_id', $user->id)
-        ->whereBetween('work_date', [$startDate, $endDate])
-        ->orderBy('work_date')
-        ->get();
-
-    return view('attendance.list', [
-        'attendances'  => $attendances,
-        'currentMonth' => $currentMonth,
-        'prevMonth'    => $prevMonth,
-        'nextMonth'    => $nextMonth,
-    ]);
-}
-public function detail($id)
-{
-    $user = Auth::user();
-
-    $attendance = Attendance::where('id', $id)
-        ->where('user_id', $user->id)
-        ->firstOrFail();
-
-    $weeks = ['日', '月', '火', '水', '木', '金', '土'];
+        $weeks = ['日', '月', '火', '水', '木', '金', '土'];
         $date  = Carbon::parse($attendance->work_date);
         $week  = $weeks[$date->dayOfWeek];
 
-        // 休憩（最大2つ表示する想定）
         $breaks = DB::table('breaks')
             ->where('attendance_id', $attendance->id)
             ->orderBy('break_start')
             ->get();
 
-        $break1 = $breaks[0] ?? null;
-        $break2 = $breaks[1] ?? null;
+        $break1 = $breaks->get(0);
+        $break2 = $breaks->get(1);
 
-    return view('attendance.detail', [
-        'attendance' => $attendance,
-        'user'      => $user,
-        'date'      => $date,
-        'week'      => $week,
-        'break1'    => $break1,
-        'break2'    => $break2,
-    ]);
-}
+        // 承認待ちの修正申請があるか（＝Figmaの「承認待ち勤怠のケース」に切り替える判定）
+        $pendingRequest = StampCorrectionRequest::where('user_id', $user->id)
+            ->where('attendance_id', $attendance->id)
+            ->where('status', '承認待ち')
+            ->latest('created_at')
+            ->first();
+
+        return view('attendance.detail', [
+            'attendance'     => $attendance,
+            'user'           => $user,
+            'date'           => $date,
+            'week'           => $week,
+            'break1'         => $break1,
+            'break2'         => $break2,
+            'pendingRequest' => $pendingRequest,
+        ]);
+    }
 }
