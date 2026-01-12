@@ -10,7 +10,8 @@
 @include('components.header')
 
 @php
-    $currentStatus = $status ?? request('status', 'pending');
+    $currentTab = $tab ?? request('tab', 'pending');
+    $requests = $currentTab === 'approved' ? $approvedRequests : $pendingRequests;
 @endphp
 
 <div class="request-list-page">
@@ -22,12 +23,12 @@
         </div>
 
         <div class="request-list-tabs">
-            <a href="{{ route('stamp_correction_request.list', ['status' => 'pending']) }}"
-               class="request-list-tab {{ $currentStatus === 'pending' ? 'is-active' : '' }}">
+            <a href="{{ route('stamp_correction_request.list', ['tab' => 'pending']) }}"
+               class="request-list-tab {{ $currentTab === 'pending' ? 'is-active' : '' }}">
                 承認待ち
             </a>
-            <a href="{{ route('stamp_correction_request.list', ['status' => 'approved']) }}"
-               class="request-list-tab {{ $currentStatus === 'approved' ? 'is-active' : '' }}">
+            <a href="{{ route('stamp_correction_request.list', ['tab' => 'approved']) }}"
+               class="request-list-tab {{ $currentTab === 'approved' ? 'is-active' : '' }}">
                 承認済み
             </a>
         </div>
@@ -49,26 +50,15 @@
                 <tbody>
                     @forelse($requests as $req)
                         @php
-                            $statusLabel = $req->status_label
-                                ?? (($req->status ?? null) === 'approved' || ($req->status ?? null) === 1 ? '承認済み' : '承認待ち');
-
-                            $userName = $req->user->name ?? $req->name ?? '';
-
-                            $targetRaw = $req->attendance->work_date
-                                ?? $req->attendance->date
-                                ?? $req->target_date
-                                ?? $req->attendance_date
-                                ?? null;
-
+                            $userName = optional($req->user)->name ?? '';
+                            $targetRaw = optional($req->attendance)->work_date ?? optional($req->attendance)->date;
                             $targetDate = $targetRaw ? \Illuminate\Support\Carbon::parse($targetRaw)->format('Y/m/d') : '';
-
-                            $reason = $req->remark ?? $req->reason ?? '';
-
+                            $reason = $req->remark ?? '';
                             $appliedAt = $req->created_at ? \Illuminate\Support\Carbon::parse($req->created_at)->format('Y/m/d') : '';
                         @endphp
 
                         <tr class="request-list-tr">
-                            <td class="request-list-td request-list-td--status">{{ $statusLabel }}</td>
+                            <td class="request-list-td request-list-td--status">{{ $req->status }}</td>
                             <td class="request-list-td request-list-td--name">{{ $userName }}</td>
                             <td class="request-list-td request-list-td--date">{{ $targetDate }}</td>
                             <td class="request-list-td request-list-td--reason">{{ $reason }}</td>

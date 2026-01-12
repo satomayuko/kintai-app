@@ -11,7 +11,21 @@ class LoginController extends Controller
 {
     public function store(LoginRequest $request)
     {
-        if (! Auth::attempt($request->only(['email', 'password']), false)) {
+        $credentials = $request->only(['email', 'password']);
+
+        if ($request->is('admin') || $request->is('admin/*')) {
+            if (!Auth::guard('admin')->attempt($credentials, false)) {
+                throw ValidationException::withMessages([
+                    'email' => 'ログイン情報が登録されていません',
+                ]);
+            }
+
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('admin.attendance.list'));
+        }
+
+        if (!Auth::attempt($credentials, false)) {
             throw ValidationException::withMessages([
                 'email' => 'ログイン情報が登録されていません',
             ]);
@@ -19,6 +33,6 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended('/attendance');
+        return redirect()->intended(route('attendance.index'));
     }
 }

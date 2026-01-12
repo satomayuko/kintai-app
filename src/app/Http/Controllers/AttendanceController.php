@@ -258,40 +258,39 @@ class AttendanceController extends Controller
     }
 
     public function detail($id)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $attendance = Attendance::where('id', $id)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
+    $attendance = Attendance::where('id', $id)
+        ->where('user_id', $user->id)
+        ->firstOrFail();
 
-        $weeks = ['日', '月', '火', '水', '木', '金', '土'];
-        $date  = Carbon::parse($attendance->work_date);
-        $week  = $weeks[$date->dayOfWeek];
+    $weeks = ['日', '月', '火', '水', '木', '金', '土'];
+    $date  = Carbon::parse($attendance->work_date);
+    $week  = $weeks[$date->dayOfWeek];
 
-        $breaks = DB::table('breaks')
-            ->where('attendance_id', $attendance->id)
-            ->orderBy('break_start')
-            ->get();
+    $breaks = DB::table('breaks')
+        ->where('attendance_id', $attendance->id)
+        ->orderBy('break_start')
+        ->get();
 
-        $break1 = $breaks->get(0);
-        $break2 = $breaks->get(1);
+    $break1 = $breaks->get(0);
+    $break2 = $breaks->get(1);
 
-        // 承認待ちの修正申請があるか（＝Figmaの「承認待ち勤怠のケース」に切り替える判定）
-        $pendingRequest = StampCorrectionRequest::where('user_id', $user->id)
-            ->where('attendance_id', $attendance->id)
-            ->where('status', '承認待ち')
-            ->latest('created_at')
-            ->first();
+    $latestRequest = StampCorrectionRequest::query()
+        ->where('user_id', $user->id)
+        ->where('attendance_id', $attendance->id)
+        ->latest('created_at')
+        ->first();
 
-        return view('attendance.detail', [
-            'attendance'     => $attendance,
-            'user'           => $user,
-            'date'           => $date,
-            'week'           => $week,
-            'break1'         => $break1,
-            'break2'         => $break2,
-            'pendingRequest' => $pendingRequest,
-        ]);
-    }
+    return view('attendance.detail', [
+        'attendance'     => $attendance,
+        'user'           => $user,
+        'date'           => $date,
+        'week'           => $week,
+        'break1'         => $break1,
+        'break2'         => $break2,
+        'latestRequest'  => $latestRequest,
+    ]);
+}
 }

@@ -1,0 +1,178 @@
+body {
+    background-color: #F0EFF2;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+}
+
+.attendance-list-page {
+    background: #F0EFF2;
+    min-height: 100vh;
+    padding: 80px 0 120px;
+}
+
+.attendance-list-inner {
+    width: 900px;
+    margin: 0 auto;
+}
+
+.attendance-list-title {
+    display: flex;
+    align-items: center;
+    gap: 21px;
+    margin: 0;
+}
+
+.attendance-list-title-line {
+    width: 8px;
+    height: 40px;
+    background-color: #000000;
+    border-radius: 0;
+    margin-right: 0;
+}
+
+.attendance-list-title-text {
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: 0;
+    color: #000000;
+    margin: 0;
+}
+
+.attendance-list-month-bar {
+    width: 900px;
+    height: 60px;
+    margin-top: 72px;
+    margin-bottom: 45px;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    box-sizing: border-box;
+    border: 1px solid #E1E1E1;
+}
+
+.month-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.month-nav__icon {
+    width: 20px;
+    height: 15px;
+}
+
+.month-nav__label {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #737373;
+}
+
+.month-center {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.month-center__icon {
+    width: 25px;
+    height: 25px;
+}
+
+.month-center__text {
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: 0;
+    color: #000000;
+}
+
+.attendance-list-card {
+    width: 900px;
+    background: #FFFFFF;
+    border: 1px solid #E1E1E1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.attendance-list-table__header {
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    border-bottom: 3px solid #E1E1E1;
+    box-sizing: border-box;
+    background: #FFFFFF;
+}
+
+.attendance-list-table__row {
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #E1E1E1;
+    box-sizing: border-box;
+}
+
+.attendance-list-table__row:last-child {
+    border-bottom: none;
+}
+
+.col,
+.cell {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+    color: #737373;
+    padding: 14px 8px;
+    box-sizing: border-box;
+}
+
+/* 管理者：1列目は「名前」なので幅を広め＆左寄せ（※HTMLは col--date / cell--date のままでOK） */
+.col--date,
+.cell--date {
+    flex: 0 0 240px;
+    justify-content: flex-start;
+    padding-left: 55px;
+    letter-spacing: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.col--detail,
+.cell--detail {
+    flex: 0 0 80px;
+    justify-content: center;
+}
+
+.detail-link {
+    color: #000000;
+    text-decoration: none;
+    font-family: Inter, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0.15em;
+}
+
+.attendance-list-empty {
+    padding: 28px 8px;
+    text-align: center;
+    color: #737373;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0;
+}

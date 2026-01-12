@@ -45,7 +45,7 @@ class Attendance extends Model
         return $this->breaks->reduce(function ($carry, $break) {
             if ($break->break_start && $break->break_end) {
                 return $carry + Carbon::parse($break->break_start)
-                        ->diffInMinutes(Carbon::parse($break->break_end));
+                    ->diffInMinutes(Carbon::parse($break->break_end));
             }
             return $carry;
         }, 0);
@@ -84,5 +84,15 @@ class Attendance extends Model
         $m = $total % 60;
 
         return sprintf('%d:%02d', $h, $m);
+    }
+
+    public function getBreakTimeDisplayAttribute()
+    {
+        return $this->break_time_for_display;
+    }
+
+    public function getWorkTimeDisplayAttribute()
+    {
+        return $this->work_time_for_display;
     }
 }

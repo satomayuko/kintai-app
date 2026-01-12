@@ -1,0 +1,60 @@
+.attendance-detail-page.admin-approve {
+    background-color: #F0EFF2;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    display: flex;
+    justify-content: center;
+    padding-top: 120px;
+    padding-bottom: 80px;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-inner {
+    width: 900px;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-footer {
+    width: 900px;
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-edit-button.is-disabled {
+    width: 130px;
+    height: 50px;
+    border-radius: 5px;
+    background-color: #737373;
+    color: #ffffff;
+    border: none;
+    cursor: default;
+    pointer-events: none;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-placeholder {
+    visibility: hidden;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-row--remark {
+    align-items: center;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-row--remark .attendance-detail-placeholder {
+    display: none;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-row--remark .attendance-detail-value--time-range {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+}
+
+.attendance-detail-page.admin-approve .attendance-detail-row--remark .time-text {
+    display: inline-block;
+    padding: 0 12px;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    line-height: 1.6;
+    letter-spacing: normal;
+}
