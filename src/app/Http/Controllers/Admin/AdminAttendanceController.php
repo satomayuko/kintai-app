@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AttendanceUpdateRequest;
 use App\Models\Attendance;
 use App\Models\User;
 use App\Models\WorkBreak;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -92,7 +92,7 @@ class AdminAttendanceController extends Controller
         ]);
     }
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(AttendanceUpdateRequest $request, int $id): RedirectResponse
     {
         $attendance = Attendance::with(['breaks', 'correctionRequests'])->findOrFail($id);
 
@@ -106,80 +106,7 @@ class AdminAttendanceController extends Controller
             ])->withInput();
         }
 
-        $rules = [
-            'start_time' => ['nullable', 'date_format:H:i'],
-            'end_time' => ['nullable', 'date_format:H:i'],
-            'break1_start' => ['nullable', 'date_format:H:i'],
-            'break1_end' => ['nullable', 'date_format:H:i'],
-            'break2_start' => ['nullable', 'date_format:H:i'],
-            'break2_end' => ['nullable', 'date_format:H:i'],
-            'remark' => ['required', 'string'],
-        ];
-
-        $messages = [
-            'remark.required' => '備考を記入してください',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-
-        $validator->after(function ($v) use ($attendance, $request) {
-            $dateStr = $attendance->work_date instanceof Carbon
-                ? $attendance->work_date->toDateString()
-                : Carbon::parse($attendance->work_date)->toDateString();
-
-            $toDt = function (?string $t) use ($dateStr) {
-                if (!$t) {
-                    return null;
-                }
-                return Carbon::createFromFormat('Y-m-d H:i', $dateStr . ' ' . $t);
-            };
-
-            $s = $toDt($request->input('start_time'));
-            $e = $toDt($request->input('end_time'));
-
-            if ($s && $e && $s->greaterThanOrEqualTo($e)) {
-                $v->errors()->add('start_time', '出勤時間もしくは退勤時間が不適切な値です');
-                $v->errors()->add('end_time', '出勤時間もしくは退勤時間が不適切な値です');
-                return;
-            }
-
-            $checkBreak = function (?string $bs, ?string $be, string $keyS, string $keyE) use ($v, $s, $e, $toDt) {
-                $bStart = $toDt($bs);
-                $bEnd = $toDt($be);
-
-                if (($bStart && !$bEnd) || (!$bStart && $bEnd)) {
-                    $v->errors()->add($keyS, '休憩時間が不適切な値です');
-                    return;
-                }
-
-                if (!$bStart || !$bEnd) {
-                    return;
-                }
-
-                if ($bStart->greaterThanOrEqualTo($bEnd)) {
-                    $v->errors()->add($keyS, '休憩時間が不適切な値です');
-                    $v->errors()->add($keyE, '休憩時間が不適切な値です');
-                    return;
-                }
-
-                if ($s && $bStart->lessThan($s)) {
-                    $v->errors()->add($keyS, '休憩時間が不適切な値です');
-                }
-
-                if ($e && $bStart->greaterThan($e)) {
-                    $v->errors()->add($keyS, '休憩時間が不適切な値です');
-                }
-
-                if ($e && $bEnd->greaterThan($e)) {
-                    $v->errors()->add($keyE, '休憩時間もしくは退勤時間が不適切な値です');
-                }
-            };
-
-            $checkBreak($request->input('break1_start'), $request->input('break1_end'), 'break1_start', 'break1_end');
-            $checkBreak($request->input('break2_start'), $request->input('break2_end'), 'break2_start', 'break2_end');
-        });
-
-        $validated = $validator->validate();
+        $validated = $request->validated();
 
         $dateStr = $attendance->work_date instanceof Carbon
             ? $attendance->work_date->toDateString()

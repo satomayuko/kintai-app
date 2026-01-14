@@ -33,6 +33,10 @@ class FortifyServiceProvider extends ServiceProvider
                 : view('auth.login');
         });
 
+        Fortify::verifyEmailView(function () {
+            return view('auth.verify-email');
+        });
+
         Fortify::authenticateUsing(function (Request $request) {
             $form = new LoginRequest();
 

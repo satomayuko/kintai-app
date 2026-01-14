@@ -42,12 +42,12 @@
             @if ($errors->any())
                 <ul class="attendance-detail-errors">
                     @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
+                        <li class="attendance-detail-error">{{ $error }}</li>
                     @endforeach
                 </ul>
             @endif
 
-            <form action="{{ route('admin.attendance.update', ['id' => $attendance->id]) }}" method="POST">
+            <form action="{{ route('admin.attendance.update', ['id' => $attendance->id]) }}" method="POST" novalidate>
                 @csrf
                 @method('PATCH')
 
@@ -55,7 +55,7 @@
 
                     <div class="attendance-detail-row">
                         <div class="attendance-detail-label">名前</div>
-                        <div class="attendance-detail-value">{{ $user->name }}</div>
+                        <div class="attendance-detail-value attendance-detail-value--name">{{ $user->name }}</div>
                     </div>
 
                     <div class="attendance-detail-row">
@@ -71,11 +71,15 @@
                         <div class="attendance-detail-label">出勤・退勤</div>
                         <div class="attendance-detail-value attendance-detail-value--time-range">
                             <span class="time-box">
-                                <input type="time" name="start_time" value="{{ $vStart }}" class="attendance-detail-input attendance-detail-input--time {{ $vStart === '' ? 'is-empty' : '' }}" step="60">
+                                <input type="time" name="start_time" value="{{ $vStart }}"
+                                    class="attendance-detail-input attendance-detail-input--time {{ $vStart === '' ? 'is-empty' : '' }}"
+                                    step="60" required>
                             </span>
                             <span class="time-separator">〜</span>
                             <span class="time-box">
-                                <input type="time" name="end_time" value="{{ $vEnd }}" class="attendance-detail-input attendance-detail-input--time {{ $vEnd === '' ? 'is-empty' : '' }}" step="60">
+                                <input type="time" name="end_time" value="{{ $vEnd }}"
+                                    class="attendance-detail-input attendance-detail-input--time {{ $vEnd === '' ? 'is-empty' : '' }}"
+                                    step="60" required>
                             </span>
                         </div>
                     </div>
@@ -84,11 +88,15 @@
                         <div class="attendance-detail-label">休憩</div>
                         <div class="attendance-detail-value attendance-detail-value--time-range">
                             <span class="time-box">
-                                <input type="time" name="break1_start" value="{{ $vB1S }}" class="attendance-detail-input attendance-detail-input--time {{ $vB1S === '' ? 'is-empty' : '' }}" step="60">
+                                <input type="time" name="break1_start" value="{{ $vB1S }}"
+                                    class="attendance-detail-input attendance-detail-input--time {{ $vB1S === '' ? 'is-empty' : '' }}"
+                                    step="60">
                             </span>
                             <span class="time-separator">〜</span>
                             <span class="time-box">
-                                <input type="time" name="break1_end" value="{{ $vB1E }}" class="attendance-detail-input attendance-detail-input--time {{ $vB1E === '' ? 'is-empty' : '' }}" step="60">
+                                <input type="time" name="break1_end" value="{{ $vB1E }}"
+                                    class="attendance-detail-input attendance-detail-input--time {{ $vB1E === '' ? 'is-empty' : '' }}"
+                                    step="60">
                             </span>
                         </div>
                     </div>
@@ -97,11 +105,15 @@
                         <div class="attendance-detail-label">休憩2</div>
                         <div class="attendance-detail-value attendance-detail-value--time-range">
                             <span class="time-box">
-                                <input type="time" name="break2_start" value="{{ $vB2S }}" class="attendance-detail-input attendance-detail-input--time {{ $vB2S === '' ? 'is-empty' : '' }}" step="60">
+                                <input type="time" name="break2_start" value="{{ $vB2S }}"
+                                    class="attendance-detail-input attendance-detail-input--time {{ $vB2S === '' ? 'is-empty' : '' }}"
+                                    step="60">
                             </span>
                             <span class="time-separator">〜</span>
                             <span class="time-box">
-                                <input type="time" name="break2_end" value="{{ $vB2E }}" class="attendance-detail-input attendance-detail-input--time {{ $vB2E === '' ? 'is-empty' : '' }}" step="60">
+                                <input type="time" name="break2_end" value="{{ $vB2E }}"
+                                    class="attendance-detail-input attendance-detail-input--time {{ $vB2E === '' ? 'is-empty' : '' }}"
+                                    step="60">
                             </span>
                         </div>
                     </div>
@@ -110,7 +122,7 @@
                         <div class="attendance-detail-label">備考</div>
                         <div class="attendance-detail-value">
                             <div class="attendance-detail-remark-box">
-                                <textarea name="remark" class="attendance-detail-textarea">{{ $vRemark }}</textarea>
+                                <textarea name="remark" class="attendance-detail-textarea" required maxlength="255">{{ $vRemark }}</textarea>
                             </div>
                         </div>
                     </div>

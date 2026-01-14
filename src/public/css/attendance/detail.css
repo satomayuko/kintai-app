@@ -1,42 +1,61 @@
 body {
     background-color: #F0EFF2;
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
 }
 
 .attendance-detail-page {
-    display: flex;
-    justify-content: center;
-    padding-top: 120px;
-    padding-bottom: 80px;
+    background: #F0EFF2;
+    min-height: 100vh;
+    padding: 80px 0 120px;
 }
 
 .attendance-detail-inner {
     width: 900px;
+    margin: 0 auto;
 }
 
 .attendance-detail-title {
     display: flex;
     align-items: center;
-    margin-bottom: 24px;
+    gap: 21px;
+    margin: 0;
 }
 
 .attendance-detail-title-line {
     width: 8px;
     height: 40px;
     background-color: #000000;
-    border-radius: 4px;
-    margin-right: 16px;
+    border-radius: 0;
 }
 
 .attendance-detail-title-text {
     font-weight: 700;
     font-size: 30px;
     line-height: 1;
+    letter-spacing: 0;
     color: #000000;
+    margin: 0;
+}
+
+.attendance-detail-errors {
+    width: 900px;
+    margin: 16px 0 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.attendance-detail-error {
+    margin: 0 0 8px 0;
+    color: #FF0000;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.4;
+    letter-spacing: 0.15em;
 }
 
 .attendance-detail-card {
     width: 900px;
+    margin-top: 72px;
     min-height: 449px;
     height: auto;
     background-color: #ffffff;
@@ -48,7 +67,7 @@ body {
 
 .attendance-detail-row {
     display: grid;
-    grid-template-columns: 333px 1fr 333px;
+    grid-template-columns: 333px 1fr;
     align-items: center;
     height: 89px;
     border-bottom: 2px solid #E1E1E1;
@@ -60,7 +79,6 @@ body {
 }
 
 .attendance-detail-label {
-    grid-column: 1;
     padding-left: 64px;
     font-weight: 700;
     font-size: 16px;
@@ -69,51 +87,36 @@ body {
     color: #737373;
 }
 
-/* 既定：2列目は中央に“箱”を置く（Figmaの年号/時刻の基準） */
 .attendance-detail-value {
-    grid-column: 2;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     font-weight: 700;
     font-size: 16px;
     line-height: 1;
     letter-spacing: 0.15em;
     color: #000000;
+    padding-left: 60px;
+    box-sizing: border-box;
 }
 
-/* 名前だけ：左寄せ（年号の位置感に合わせる） */
-.attendance-detail-row:first-child .attendance-detail-value {
-    justify-content: flex-start;
-    padding-left: 24px;
-}
-
-/* 日付：316pxの塊を中央固定（103 + 110 + 103） */
 .attendance-detail-value--date {
-    width: 316px;
-    margin: 0 auto;
-    justify-content: center;
-    padding-left: 0;
+    padding-left: 60px;
 }
 
 .date-year,
 .date-day {
     width: 103px;
-    text-align: center;
+    text-align: left;
 }
 
 .date-spacer {
     width: 110px;
+    flex: 0 0 110px;
 }
 
-/* 時刻：316pxの塊を中央固定 */
 .attendance-detail-value--time-range {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 316px;
-    margin: 0 auto;
-    padding-left: 0;
+    padding-left: 36px;
 }
 
 .time-box,
@@ -194,7 +197,6 @@ body {
     color: inherit;
 }
 
-/* WebKitの“時刻フィールドの中身”も同じタイポに揃える（色は固定しない） */
 .time-box input[type="time"]::-webkit-datetime-edit,
 .time-box input[type="time"]::-webkit-datetime-edit-fields-wrapper,
 .time-box input[type="time"]::-webkit-datetime-edit-text,
@@ -208,7 +210,6 @@ body {
     color: inherit;
 }
 
-/* ★空欄（is-empty）かつフォーカス外のときだけ --:-- を消す */
 .time-box input[type="time"].is-empty:not(:focus)::-webkit-datetime-edit,
 .time-box input[type="time"].is-empty:not(:focus)::-webkit-datetime-edit-fields-wrapper,
 .time-box input[type="time"].is-empty:not(:focus)::-webkit-datetime-edit-text,
@@ -228,10 +229,10 @@ body {
     -webkit-appearance: none;
 }
 
-/* 備考：中央に316pxの箱（表示/入力どちらでも崩れない） */
 .attendance-detail-row--remark .attendance-detail-value {
-    justify-content: center;
-    padding-left: 0;
+    padding-left: 36px;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .attendance-detail-remark-box {
@@ -240,10 +241,11 @@ body {
     border-radius: 4px;
     border: 1px solid #D9D9D9;
     box-sizing: border-box;
-    padding: 16px;
-    display: flex;
-    align-items: flex-start;
     background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 21px 0 13px;
 }
 
 .attendance-detail-textarea {
@@ -258,27 +260,27 @@ body {
     resize: none;
     font-weight: 700;
     font-size: 14px;
-    line-height: 1.4;
+    line-height: 1;
     letter-spacing: 0.15em;
     color: #000000;
     font-family: inherit;
+    line-height: 1;
+    padding-top: 27px;
+    padding-bottom: 0;
 }
 
 .attendance-detail-remark-text {
     width: 282px;
     height: 65px;
+    margin: 0 0 0 13px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    /* 左寄せ */
-    padding-left: 16px;
-    /* 左に余白（好みで） */
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     font-weight: 700;
     font-size: 14px;
-    line-height: 100%;
+    line-height: 1;
     letter-spacing: 0.15em;
-    /* ＝15% */
     color: #000000;
 }
 
@@ -308,12 +310,17 @@ body {
 }
 
 .attendance-detail-warning {
-    width: 900px;
+    width: 355px;
+    height: 21px;
     margin: 32px 0 0 auto;
-    text-align: right;
-    color: #FF0000;
-    font-weight: 700;
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: Inter, sans-serif;
+    font-weight: 800;
+    font-size: 18px;
     line-height: 1;
     letter-spacing: 0.15em;
+    color: rgba(255, 0, 0, 0.5);
+    box-sizing: border-box;
 }

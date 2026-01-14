@@ -228,3 +228,8 @@ header {
         width: 25vw;
     }
 }
+
+body.verify-page,
+body.auth-page {
+    background-color: #fff;
+}

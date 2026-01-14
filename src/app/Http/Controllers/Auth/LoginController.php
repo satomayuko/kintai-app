@@ -31,6 +31,23 @@ class LoginController extends Controller
             ]);
         }
 
+        $user = Auth::user();
+
+        $isVerified = method_exists($user, 'hasVerifiedEmail')
+            ? $user->hasVerifiedEmail()
+            : !is_null($user->email_verified_at);
+
+        if (!$isVerified) {
+            Auth::logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'メール認証が完了していません',
+            ]);
+        }
+
         $request->session()->regenerate();
 
         return redirect()->intended(route('attendance.index'));

@@ -9,9 +9,11 @@
 
     @php
         $hideNav =
-            request()->routeIs('login', 'register', 'login.store')
+            ($hideNav ?? false)
+            || request()->routeIs('login', 'register', 'login.store')
             || request()->routeIs('admin.login.form', 'admin.login.store')
-            || request()->is('login', 'register', 'admin', 'admin/login');
+            || request()->routeIs('verification.notice')
+            || request()->is('login', 'register', 'email/verify', 'admin', 'admin/login');
     @endphp
 
     @unless($hideNav)

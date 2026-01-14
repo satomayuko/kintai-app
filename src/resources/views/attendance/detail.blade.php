@@ -52,7 +52,7 @@
                 <span class="attendance-detail-title-text">勤怠詳細</span>
             </div>
 
-            @if(!$canEdit)
+            @if (!$canEdit)
 
                 <div class="attendance-detail-card">
 
@@ -88,7 +88,7 @@
                         </div>
                     </div>
 
-                    @if($displayBreak2Start && $displayBreak2End)
+                    @if ($displayBreak2Start && $displayBreak2End)
                         <div class="attendance-detail-row">
                             <div class="attendance-detail-label">休憩2</div>
                             <div class="attendance-detail-value attendance-detail-value--time-range">
@@ -110,9 +110,9 @@
 
                 </div>
 
-                @if($isPending)
+                @if ($isPending)
                     <p class="attendance-detail-warning">*承認待ちのため修正はできません。</p>
-                @elseif($isApproved)
+                @elseif ($isApproved)
                     <p class="attendance-detail-warning">*承認済みのため修正はできません。</p>
                 @endif
 
@@ -121,6 +121,14 @@
                 <form action="{{ route('stamp_correction_request.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="attendance_id" value="{{ $attendance->id }}">
+
+                    @if ($errors->any())
+                        <ul class="attendance-detail-errors">
+                            @foreach ($errors->all() as $error)
+                                <li class="attendance-detail-error">{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
 
                     <div class="attendance-detail-card">
 
@@ -205,7 +213,7 @@
                             <div class="attendance-detail-label">備考</div>
                             <div class="attendance-detail-value">
                                 <div class="attendance-detail-remark-box">
-                                    <textarea name="remark" class="attendance-detail-textarea">{{ $vRemark }}</textarea>
+                                    <textarea name="remark" class="attendance-detail-textarea" maxlength="255">{{ $vRemark }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -221,25 +229,25 @@
 
         </div>
     </div>
+
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const timeInputs = document.querySelectorAll('.attendance-detail-input--time');
+        document.addEventListener('DOMContentLoaded', function () {
+            const timeInputs = document.querySelectorAll('.attendance-detail-input--time');
 
-        const sync = (el) => {
-            if (el.value && el.value.trim() !== '') {
-                el.classList.remove('is-empty');
-            } else {
-                el.classList.add('is-empty');
-            }
-        };
+            const sync = (el) => {
+                if (el.value && el.value.trim() !== '') {
+                    el.classList.remove('is-empty');
+                } else {
+                    el.classList.add('is-empty');
+                }
+            };
 
-        timeInputs.forEach((el) => {
-            sync(el);
-
-            el.addEventListener('input', () => sync(el));
-            el.addEventListener('change', () => sync(el));
-            el.addEventListener('blur', () => sync(el));
+            timeInputs.forEach((el) => {
+                sync(el);
+                el.addEventListener('input', () => sync(el));
+                el.addEventListener('change', () => sync(el));
+                el.addEventListener('blur', () => sync(el));
+            });
         });
-    });
     </script>
 @endsection

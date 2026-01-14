@@ -1,5 +1,7 @@
 @extends('layouts.default')
 
+@section('body_class', 'auth-page')
+
 @section('title','ログイン')
 
 @section('css')
