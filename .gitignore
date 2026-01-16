@@ -16,3 +16,5 @@ yarn-error.log
 /docker/mysql/data/
 /src/vendor/
 _backup/
+.DS_Store
+**/.DS_Store
