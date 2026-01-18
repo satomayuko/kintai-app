@@ -2,9 +2,7 @@
     box-sizing: border-box;
 }
 
-/* 画面全体 */
 body {
-    /* 横スクロール防止＋余白なし */
     margin: 0;
     background-color: #F0EFF2;
 }
@@ -27,35 +25,26 @@ select {
     outline: none;
 }
 
-/* =====================
-   ヘッダー（Figma 準拠）
-   ===================== */
 header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     height: 60px;
     padding: 0 30px;
-
     background-color: #000;
     color: #fff;
     font-size: 16px;
-
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
-/* ロゴ */
 .header__logo {
     width: 370px;
-    /* Figma に合わせて調整。小さくしたければ 250px くらいでもOK */
     height: fit-content;
     vertical-align: middle;
 }
 
-/* ナビゲーション */
 .header__nav {
     display: flex;
 }
@@ -64,51 +53,36 @@ header {
     display: flex;
     align-items: center;
     gap: 40px;
-    /* 「勤怠」「勤怠一覧」「申請」「ログアウト」の間隔 */
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-/* メニュー文字（勤怠／勤怠一覧／申請／ログアウト） */
 .header__nav a,
 .header__logout {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
     font-weight: 700;
-    /* Bold */
     font-size: 24px;
-    /* Figma の文字サイズ */
     line-height: 1;
-    /* 100% */
     letter-spacing: 0;
-    /* Figma 0% */
-
     color: #fff;
     text-decoration: none;
-
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* ログアウトボタン（form 内の button） */
 .header__logout {
     background: transparent;
     border: none;
     cursor: pointer;
 }
 
-/* hover 時は少し太く（or 下線など好みで） */
 .header__nav li:hover a,
 .header__logout:hover {
     font-weight: 700;
     opacity: 0.8;
 }
-
-/* ======== ここから下は既存のスタイル ======== */
-
-/* （検索フォームや出品ボタンは今の勤怠ヘッダーでは使ってないけど、
-   将来使うかもしれないのでそのまま残しておく） */
 
 .header_search {
     display: flex;
@@ -139,7 +113,6 @@ header {
     transition: 0.3s;
 }
 
-/* コンテンツ共通 */
 .container {
     padding: 5%;
 }

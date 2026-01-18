@@ -109,7 +109,83 @@ body {
     display: inline-block;
     margin: 0;
 }
+
 .attendance-page.center {
     width: 100%;
     padding: 0;
+}
+
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .attendance-page {
+        margin-top: 220px;
+    }
+
+    .attendance-date {
+        font-size: 42px;
+        margin-bottom: 44px;
+    }
+
+    .attendance-time {
+        font-size: 84px;
+        margin-bottom: 68px;
+    }
+
+    .attendance-buttons {
+        gap: 96px;
+        margin-top: 44px;
+    }
+
+    .attendance-start-button,
+    .attendance-end-button,
+    .attendance-break-in-button,
+    .attendance-break-out-button {
+        width: 240px;
+        height: 80px;
+        font-size: 32px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .attendance-page {
+        margin-top: 160px;
+        padding: 0 24px;
+    }
+
+    .attendance-status {
+        width: 96px;
+        height: 38px;
+        font-size: 16px;
+        margin-bottom: 28px;
+    }
+
+    .attendance-date {
+        font-size: 32px;
+        margin-bottom: 32px;
+    }
+
+    .attendance-time {
+        font-size: 64px;
+        margin-bottom: 52px;
+    }
+
+    .attendance-buttons {
+        width: 100%;
+        gap: 32px;
+        margin-top: 32px;
+    }
+
+    .attendance-start-button,
+    .attendance-end-button,
+    .attendance-break-in-button,
+    .attendance-break-out-button {
+        width: 100%;
+        max-width: 260px;
+        height: 70px;
+        font-size: 26px;
+        letter-spacing: 0.12em;
+    }
+
+    .attendance-finished-message {
+        font-size: 22px;
+    }
 }

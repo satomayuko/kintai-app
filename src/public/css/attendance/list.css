@@ -10,8 +10,11 @@ body {
 }
 
 .attendance-list-inner {
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
     margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
 }
 
 .attendance-list-title {
@@ -39,7 +42,8 @@ body {
 }
 
 .attendance-list-month-bar {
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
     height: 60px;
     margin-top: 72px;
     margin-bottom: 45px;
@@ -93,7 +97,8 @@ body {
 }
 
 .attendance-list-card {
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
     background: #FFFFFF;
     border: 1px solid #E1E1E1;
     border-radius: 10px;
@@ -170,4 +175,86 @@ body {
     font-size: 16px;
     line-height: 1;
     letter-spacing: 0;
+}
+
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .attendance-list-page {
+        padding: 96px 0 140px;
+    }
+
+    .attendance-list-inner {
+        max-width: 960px;
+        padding: 0 24px;
+    }
+
+    .attendance-list-title-text {
+        font-size: 32px;
+    }
+
+    .attendance-list-month-bar {
+        max-width: 960px;
+        padding: 0 36px;
+    }
+
+    .attendance-list-card {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .attendance-list-page {
+        padding: 64px 0 96px;
+    }
+
+    .attendance-list-inner {
+        max-width: 720px;
+        padding: 0 20px;
+    }
+
+    .attendance-list-title-line {
+        height: 36px;
+    }
+
+    .attendance-list-title-text {
+        font-size: 28px;
+    }
+
+    .attendance-list-month-bar {
+        max-width: 720px;
+        margin-top: 56px;
+        margin-bottom: 36px;
+        padding: 0 20px;
+    }
+
+    .month-nav__label {
+        font-size: 14px;
+    }
+
+    .month-center__text {
+        font-size: 18px;
+    }
+
+    .attendance-list-card {
+        max-width: 720px;
+    }
+
+    .col,
+    .cell {
+        font-size: 14px;
+        padding: 12px 6px;
+    }
+
+    .col--date,
+    .cell--date {
+        padding-left: 24px;
+    }
+
+    .col--detail,
+    .cell--detail {
+        flex: 0 0 72px;
+    }
+
+    .detail-link {
+        font-size: 14px;
+    }
 }

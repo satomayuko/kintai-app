@@ -130,3 +130,55 @@
     padding: 28px 8px;
     letter-spacing: 0;
 }
+
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .request-list-page {
+        padding: 96px 0 140px;
+    }
+
+    .request-list-container {
+        width: min(980px, calc(100% - 48px));
+    }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .request-list-page {
+        padding: 64px 0 96px;
+    }
+
+    .request-list-container {
+        width: calc(100% - 40px);
+    }
+
+    .request-list-title-text {
+        font-size: 28px;
+    }
+
+    .request-list-tabs {
+        gap: 48px;
+        margin-top: 56px;
+        flex-wrap: wrap;
+    }
+
+    .request-list-tab {
+        font-size: 14px;
+        letter-spacing: 0.12em;
+        padding-bottom: 14px;
+    }
+
+    .request-list-table-wrap {
+        margin-top: 32px;
+    }
+
+    .request-list-th,
+    .request-list-td,
+    .request-list-detail-link {
+        font-size: 14px;
+        letter-spacing: 0.12em;
+    }
+
+    .request-list-th,
+    .request-list-td {
+        padding: 12px 6px;
+    }
+}

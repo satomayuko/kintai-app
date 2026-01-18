@@ -319,3 +319,127 @@ body {
     line-height: 1;
     letter-spacing: 0.15em;
 }
+
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .attendance-detail-page {
+        padding-top: 140px;
+        padding-bottom: 96px;
+    }
+
+    .attendance-detail-inner {
+        width: 980px;
+    }
+
+    .attendance-detail-errors {
+        width: 980px;
+    }
+
+    .attendance-detail-card {
+        width: 980px;
+    }
+
+    .attendance-detail-footer {
+        width: 980px;
+    }
+
+    .attendance-detail-warning {
+        width: 980px;
+    }
+
+    .attendance-detail-title-text {
+        font-size: 32px;
+    }
+
+    .attendance-detail-row {
+        grid-template-columns: 360px 1fr 360px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .attendance-detail-page {
+        padding-top: 96px;
+        padding-bottom: 64px;
+        padding-left: 20px;
+        padding-right: 20px;
+        box-sizing: border-box;
+    }
+
+    .attendance-detail-inner {
+        width: 100%;
+    }
+
+    .attendance-detail-errors {
+        width: 100%;
+    }
+
+    .attendance-detail-card {
+        width: 100%;
+    }
+
+    .attendance-detail-footer {
+        width: 100%;
+    }
+
+    .attendance-detail-warning {
+        width: 100%;
+    }
+
+    .attendance-detail-title-text {
+        font-size: 28px;
+    }
+
+    .attendance-detail-row {
+        grid-template-columns: 240px 1fr 240px;
+        height: 80px;
+    }
+
+    .attendance-detail-label {
+        padding-left: 32px;
+        font-size: 14px;
+    }
+
+    .attendance-detail-value {
+        font-size: 14px;
+    }
+
+    .time-separator {
+        font-size: 14px;
+    }
+
+    .time-text {
+        font-size: 14px;
+    }
+
+    .attendance-detail-input {
+        font-size: 14px;
+    }
+
+    .attendance-detail-value--date,
+    .attendance-detail-value--time-range {
+        width: 300px;
+    }
+
+    .date-year,
+    .date-day,
+    .time-box,
+    .time-text {
+        width: 96px;
+        flex: 0 0 96px;
+    }
+
+    .date-spacer,
+    .time-separator {
+        width: 108px;
+        flex: 0 0 108px;
+    }
+
+    .attendance-detail-remark-box {
+        width: 300px;
+        height: 72px;
+    }
+
+    .attendance-detail-edit-button {
+        font-size: 20px;
+        width: 130px;
+    }
+}

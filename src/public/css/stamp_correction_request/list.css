@@ -5,8 +5,10 @@
 }
 
 .request-list-container {
-    width: 900px;
+    width: 100%;
+    max-width: 900px;
     margin: 0 auto;
+    padding: 0 24px;
 }
 
 .request-list-title {
@@ -36,6 +38,7 @@
     align-items: center;
     gap: 106px;
     margin-top: 72px;
+    flex-wrap: wrap;
 }
 
 .request-list-tab {
@@ -54,7 +57,7 @@
 }
 
 .request-list-tabs-line {
-    width: 900px;
+    width: 100%;
     height: 1px;
     background: #000000;
     margin-top: -2px;
@@ -62,10 +65,11 @@
 
 .request-list-table-wrap {
     margin-top: 45px;
+    overflow-x: auto;
 }
 
 .request-list-table {
-    width: 900px;
+    width: 100%;
     border-collapse: collapse;
     background: #FFFFFF;
     border: 1px solid #E1E1E1;
@@ -85,6 +89,7 @@
     padding: 14px 8px;
     border-bottom: 3px solid #E1E1E1;
     background: #FFFFFF;
+    white-space: nowrap;
 }
 
 .request-list-td {
@@ -97,6 +102,7 @@
     padding: 14px 8px;
     border-bottom: 2px solid #E1E1E1;
     letter-spacing: 0.15em;
+    white-space: nowrap;
 }
 
 .request-list-td--date {
@@ -124,4 +130,55 @@
 .request-list-td--empty {
     padding: 28px 8px;
     letter-spacing: 0;
+}
+
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .request-list-container {
+        max-width: 960px;
+        padding: 0 24px;
+    }
+
+    .request-list-tabs {
+        gap: 120px;
+        margin-top: 80px;
+    }
+
+    .request-list-table-wrap {
+        margin-top: 48px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .request-list-page {
+        padding: 64px 0 96px;
+    }
+
+    .request-list-container {
+        max-width: 720px;
+        padding: 0 20px;
+    }
+
+    .request-list-title-text {
+        font-size: 28px;
+    }
+
+    .request-list-tabs {
+        gap: 48px;
+        margin-top: 56px;
+    }
+
+    .request-list-tab {
+        font-size: 16px;
+        padding-bottom: 16px;
+    }
+
+    .request-list-table-wrap {
+        margin-top: 40px;
+    }
+
+    .request-list-th,
+    .request-list-td,
+    .request-list-detail-link {
+        font-size: 16px;
+    }
 }

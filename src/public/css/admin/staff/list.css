@@ -88,3 +88,51 @@
 .admin-staff-list__detail-link:hover {
     opacity: 0.7;
 }
+
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .admin-staff-list__inner {
+        width: 980px;
+        padding-top: 220px;
+    }
+
+    .admin-staff-list__title {
+        font-size: 32px;
+    }
+
+    .admin-staff-list__title-area {
+        margin-bottom: 112px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .admin-staff-list__inner {
+        width: 100%;
+        padding-top: 140px;
+        padding-left: 20px;
+        padding-right: 20px;
+        box-sizing: border-box;
+    }
+
+    .admin-staff-list__title {
+        font-size: 28px;
+    }
+
+    .admin-staff-list__title-area {
+        margin-bottom: 72px;
+    }
+
+    .admin-staff-list__th,
+    .admin-staff-list__td,
+    .admin-staff-list__detail-link {
+        font-size: 14px;
+        letter-spacing: 0.12em;
+    }
+
+    .admin-staff-list__th {
+        padding: 12px 0 10px;
+    }
+
+    .admin-staff-list__td {
+        padding: 14px 0;
+    }
+}

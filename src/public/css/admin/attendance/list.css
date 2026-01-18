@@ -139,7 +139,6 @@ body {
     box-sizing: border-box;
 }
 
-/* 管理者：1列目は「名前」なので幅を広め＆左寄せ（※HTMLは col--date / cell--date のままでOK） */
 .col--date,
 .cell--date {
     flex: 0 0 240px;
@@ -175,4 +174,86 @@ body {
     font-size: 16px;
     line-height: 1;
     letter-spacing: 0;
+}
+
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .attendance-list-page {
+        padding: 96px 0 140px;
+    }
+
+    .attendance-list-inner {
+        width: 980px;
+    }
+
+    .attendance-list-month-bar {
+        width: 980px;
+    }
+
+    .attendance-list-card {
+        width: 980px;
+    }
+
+    .attendance-list-title-text {
+        font-size: 32px;
+    }
+
+    .month-center__text {
+        font-size: 22px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+    .attendance-list-page {
+        padding: 64px 0 96px;
+    }
+
+    .attendance-list-inner {
+        width: 100%;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    .attendance-list-month-bar {
+        width: 100%;
+        padding: 0 20px;
+        margin-top: 56px;
+        margin-bottom: 40px;
+    }
+
+    .attendance-list-card {
+        width: 100%;
+    }
+
+    .attendance-list-title-text {
+        font-size: 28px;
+    }
+
+    .month-nav__label {
+        font-size: 14px;
+    }
+
+    .month-center__text {
+        font-size: 18px;
+    }
+
+    .col,
+    .cell {
+        font-size: 14px;
+        padding: 12px 6px;
+    }
+
+    .col--date,
+    .cell--date {
+        flex: 0 0 200px;
+        padding-left: 32px;
+    }
+
+    .col--detail,
+    .cell--detail {
+        flex: 0 0 72px;
+    }
+
+    .detail-link {
+        font-size: 14px;
+    }
 }
