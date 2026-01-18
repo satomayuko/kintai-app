@@ -149,5 +149,11 @@ return [
     'attributes' => [
         'email' => 'メールアドレス',
         'password' => 'パスワード',
+        'start_time' => '出勤時刻',
+        'end_time' => '退勤時刻',
+        'remark' => '備考',
+        'breaks' => '休憩',
+        'breaks.*.break_start' => '休憩開始',
+        'breaks.*.break_end' => '休憩終了',
     ],
 ];

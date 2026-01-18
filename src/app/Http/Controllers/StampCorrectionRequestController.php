@@ -4,18 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StampCorrectionRequest as StampCorrectionRequestRequest;
 use App\Models\StampCorrectionRequest as StampCorrectionRequestModel;
+use App\Models\StampCorrectionRequestBreak;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StampCorrectionRequestController extends Controller
 {
-    public function list(\Illuminate\Http\Request $request)
+    public function list(Request $request)
     {
         $tab = $request->query('tab', 'pending');
 
         $base = StampCorrectionRequestModel::query()
             ->where('user_id', Auth::id())
-            ->with(['user', 'attendance'])
+            ->with(['user', 'attendance', 'breaks'])
             ->orderByDesc('created_at');
 
         $pendingRequests = (clone $base)->where('status', 0)->get();
@@ -49,32 +52,57 @@ class StampCorrectionRequestController extends Controller
             ->exists();
 
         if ($alreadyPending) {
-            return redirect()
-                ->route('attendance.detail', ['id' => $attendanceId])
-                ->with('message', 'すでに承認待ちの申請があります');
+            return redirect()->route('attendance.detail', ['id' => $attendanceId]);
         }
 
-        StampCorrectionRequestModel::create([
-            'user_id' => $user->id,
-            'attendance_id' => $attendanceId,
-            'corrected_start' => $this->toTimeOrNull($validated['start_time'] ?? null),
-            'corrected_end' => $this->toTimeOrNull($validated['end_time'] ?? null),
-            'break1_start' => $this->toTimeOrNull($validated['break1_start'] ?? null),
-            'break1_end' => $this->toTimeOrNull($validated['break1_end'] ?? null),
-            'break2_start' => $this->toTimeOrNull($validated['break2_start'] ?? null),
-            'break2_end' => $this->toTimeOrNull($validated['break2_end'] ?? null),
-            'remark' => $validated['remark'],
-            'status' => 0,
-        ]);
+        DB::transaction(function () use ($user, $attendanceId, $validated) {
+            $correctionRequest = StampCorrectionRequestModel::create([
+                'user_id' => $user->id,
+                'attendance_id' => $attendanceId,
+                'corrected_start' => $this->toTimeOrNull($validated['start_time'] ?? null),
+                'corrected_end' => $this->toTimeOrNull($validated['end_time'] ?? null),
+                'remark' => $validated['remark'] ?? '',
+                'status' => 0,
+            ]);
 
-        return redirect()
-            ->route('attendance.detail', ['id' => $attendanceId])
-            ->with('message', '修正申請を送信しました');
+            $breakRows = $validated['breaks'] ?? [];
+            if (!is_array($breakRows)) {
+                $breakRows = [];
+            }
+
+            $sortOrder = 1;
+
+            foreach ($breakRows as $row) {
+                $startStr = $row['break_start'] ?? null;
+                $endStr = $row['break_end'] ?? null;
+
+                $startStr = ($startStr === '') ? null : $startStr;
+                $endStr = ($endStr === '') ? null : $endStr;
+
+                $start = $this->toTimeOrNull($startStr);
+                $end = $this->toTimeOrNull($endStr);
+
+                if ($start === null && $end === null) {
+                    continue;
+                }
+
+                StampCorrectionRequestBreak::create([
+                    'stamp_correction_request_id' => $correctionRequest->id,
+                    'break_start' => $start,
+                    'break_end' => $end,
+                    'sort_order' => $sortOrder,
+                ]);
+
+                $sortOrder++;
+            }
+        });
+
+        return redirect()->route('attendance.detail', ['id' => $attendanceId]);
     }
 
     private function toTimeOrNull(?string $hhmm): ?string
     {
-        if (!$hhmm) {
+        if ($hhmm === null || $hhmm === '') {
             return null;
         }
 

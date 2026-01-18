@@ -15,12 +15,22 @@
         $user = $attendance->user;
         $date = \Carbon\Carbon::parse($attendance->work_date);
 
-        $breaks = $attendance->breaks->values();
-        $break1 = $breaks->get(0);
-        $break2 = $breaks->get(1);
+        $requestBreaks = null;
+        if (!empty($latestRequest) && $latestRequest->relationLoaded('breaks')) {
+            $requestBreaks = $latestRequest->breaks->values();
+        } elseif (!empty($latestRequest)) {
+            $requestBreaks = $latestRequest->breaks()->orderBy('sort_order')->get()->values();
+        }
 
-        $vStart = old('start_time', $fmt($attendance->start_time));
-        $vEnd   = old('end_time',   $fmt($attendance->end_time));
+        $sourceBreaks = ($requestBreaks && $requestBreaks->count() > 0)
+            ? $requestBreaks
+            : $attendance->breaks->values();
+
+        $break1 = $sourceBreaks->get(0);
+        $break2 = $sourceBreaks->get(1);
+
+        $vStart = old('start_time', $fmt(!empty($latestRequest) ? ($latestRequest->corrected_start ?? $attendance->start_time) : $attendance->start_time));
+        $vEnd   = old('end_time',   $fmt(!empty($latestRequest) ? ($latestRequest->corrected_end ?? $attendance->end_time) : $attendance->end_time));
 
         $vB1S = old('break1_start', $fmt(optional($break1)->break_start));
         $vB1E = old('break1_end',   $fmt(optional($break1)->break_end));
@@ -28,7 +38,7 @@
         $vB2S = old('break2_start', $fmt(optional($break2)->break_start));
         $vB2E = old('break2_end',   $fmt(optional($break2)->break_end));
 
-        $vRemark = old('remark', $attendance->remark ?? '');
+        $vRemark = old('remark', (!empty($latestRequest) ? ($latestRequest->remark ?? ($attendance->remark ?? '')) : ($attendance->remark ?? '')));
     @endphp
 
     <div class="attendance-detail-page">

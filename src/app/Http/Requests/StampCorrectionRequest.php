@@ -2,9 +2,12 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Attendance;
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StampCorrectionRequest extends FormRequest
 {
@@ -22,12 +25,11 @@ class StampCorrectionRequest extends FormRequest
                 Rule::exists('attendances', 'id')->where(fn ($q) => $q->where('user_id', Auth::id())),
             ],
             'start_time' => ['required', 'date_format:H:i'],
-            'end_time' => ['required', 'date_format:H:i'],
+            'end_time'   => ['required', 'date_format:H:i'],
 
-            'break1_start' => ['nullable', 'date_format:H:i'],
-            'break1_end' => ['nullable', 'date_format:H:i'],
-            'break2_start' => ['nullable', 'date_format:H:i'],
-            'break2_end' => ['nullable', 'date_format:H:i'],
+            'breaks' => ['nullable', 'array'],
+            'breaks.*.break_start' => ['nullable', 'date_format:H:i'],
+            'breaks.*.break_end'   => ['nullable', 'date_format:H:i'],
 
             'remark' => ['required', 'string', 'max:255'],
         ];
@@ -35,51 +37,66 @@ class StampCorrectionRequest extends FormRequest
 
     public function withValidator($validator): void
     {
-        $validator->after(function ($validator) {
-            $start = $this->input('start_time');
-            $end = $this->input('end_time');
-
-            if ($start && $end && $start >= $end) {
-                $validator->errors()->add('time_range', '出勤時間もしくは退勤時間が不適切な値です');
+        $validator->after(function (Validator $v) {
+            $attendanceId = $this->input('attendance_id');
+            $attendance = $attendanceId ? Attendance::query()->find($attendanceId) : null;
+            if (!$attendance) {
                 return;
             }
 
-            if (!($start && $end)) {
+            $workDate = Carbon::parse($attendance->work_date)->format('Y-m-d');
+
+            $startStr = $this->input('start_time');
+            $endStr   = $this->input('end_time');
+
+            if (!$startStr || !$endStr) {
                 return;
             }
 
-            $breaks = [
-                [$this->input('break1_start'), $this->input('break1_end')],
-                [$this->input('break2_start'), $this->input('break2_end')],
-            ];
+            $start = Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $startStr);
+            $end   = Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $endStr);
 
-            foreach ($breaks as [$bs, $be]) {
-                if (!$bs && !$be) {
+            if ($start->gte($end)) {
+                $v->errors()->add('time_range', '出勤時間もしくは退勤時間が不適切な値です');
+                return;
+            }
+
+            $breaks = $this->input('breaks', []);
+            if (!is_array($breaks)) {
+                return;
+            }
+
+            foreach ($breaks as $row) {
+                $bsStr = $row['break_start'] ?? null;
+                $beStr = $row['break_end'] ?? null;
+
+                $bsStr = ($bsStr === '') ? null : $bsStr;
+                $beStr = ($beStr === '') ? null : $beStr;
+
+                if ($bsStr === null && $beStr === null) {
                     continue;
                 }
 
-                if (!$bs || !$be) {
-                    $validator->errors()->add('break_range', '休憩時間が勤務時間外です');
+                if ($bsStr === null || $beStr === null) {
+                    $v->errors()->add('break_range', '休憩時間が不適切な値です');
                     return;
                 }
 
-                if ($bs > $end) {
-                    $validator->errors()->add('break_range', '休憩時間が不適切な値です');
+                $bs = Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $bsStr);
+                $be = Carbon::createFromFormat('Y-m-d H:i', $workDate . ' ' . $beStr);
+
+                if ($bs->lt($start) || $bs->gt($end)) {
+                    $v->errors()->add('break_range', '休憩時間が不適切な値です');
                     return;
                 }
 
-                if ($be > $end) {
-                    $validator->errors()->add('time_range', '休憩時間もしくは退勤時間が不適切な値です');
+                if ($be->gt($end)) {
+                    $v->errors()->add('time_range', '休憩時間もしくは退勤時間が不適切な値です');
                     return;
                 }
 
-                if ($bs < $start || $be < $start) {
-                    $validator->errors()->add('break_range', '休憩時間が勤務時間外です');
-                    return;
-                }
-
-                if ($bs >= $be) {
-                    $validator->errors()->add('break_range', '休憩時間が勤務時間外です');
+                if ($be->lte($bs)) {
+                    $v->errors()->add('break_range', '休憩時間が不適切な値です');
                     return;
                 }
             }

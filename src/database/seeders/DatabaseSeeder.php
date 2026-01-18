@@ -13,7 +13,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             AttendanceSeeder::class,
             BreakSeeder::class,
-            StampCorrectionRequestSeeder::class,
         ]);
     }
 }

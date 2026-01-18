@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\StampCorrectionRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -27,7 +27,7 @@ class AttendanceController extends Controller
         $canBreakOut = false;
         $finished    = false;
 
-        if (! $attendance) {
+        if (!$attendance) {
             $canStart = true;
         } else {
             $hasActiveBreak = DB::table('breaks')
@@ -35,13 +35,13 @@ class AttendanceController extends Controller
                 ->whereNull('break_end')
                 ->exists();
 
-            if (! is_null($attendance->end_time)) {
+            if (!is_null($attendance->end_time)) {
                 $status   = '退勤済';
                 $finished = true;
             } elseif ($hasActiveBreak) {
                 $status      = '休憩中';
                 $canBreakOut = true;
-            } elseif (! is_null($attendance->start_time)) {
+            } elseif (!is_null($attendance->start_time)) {
                 $status     = '出勤中';
                 $canEnd     = true;
                 $canBreakIn = true;
@@ -70,7 +70,7 @@ class AttendanceController extends Controller
             ['user_id' => $user->id, 'work_date' => $today]
         );
 
-        if (! is_null($attendance->start_time)) {
+        if (!is_null($attendance->start_time)) {
             return redirect()->route('attendance.index');
         }
 
@@ -90,7 +90,7 @@ class AttendanceController extends Controller
             ->whereDate('work_date', $today)
             ->first();
 
-        if (! $attendance) {
+        if (!$attendance) {
             return redirect()->route('attendance.index');
         }
 
@@ -100,8 +100,8 @@ class AttendanceController extends Controller
             ->exists();
 
         if (is_null($attendance->end_time)
-            && ! is_null($attendance->start_time)
-            && ! $hasActiveBreak
+            && !is_null($attendance->start_time)
+            && !$hasActiveBreak
         ) {
             $attendance->end_time = Carbon::now()->format('H:i:s');
             $attendance->status   = '退勤済';
@@ -120,8 +120,8 @@ class AttendanceController extends Controller
             ->whereDate('work_date', $today)
             ->first();
 
-        if (! $attendance
-            || ! is_null($attendance->end_time)
+        if (!$attendance
+            || !is_null($attendance->end_time)
             || is_null($attendance->start_time)
         ) {
             return redirect()->route('attendance.index');
@@ -132,7 +132,7 @@ class AttendanceController extends Controller
             ->whereNull('break_end')
             ->exists();
 
-        if (! $hasActiveBreak) {
+        if (!$hasActiveBreak) {
             DB::table('breaks')->insert([
                 'attendance_id' => $attendance->id,
                 'break_start'   => Carbon::now(),
@@ -157,7 +157,7 @@ class AttendanceController extends Controller
             ->whereDate('work_date', $today)
             ->first();
 
-        if (! $attendance || ! is_null($attendance->end_time)) {
+        if (!$attendance || !is_null($attendance->end_time)) {
             return redirect()->route('attendance.index');
         }
 
@@ -258,39 +258,36 @@ class AttendanceController extends Controller
     }
 
     public function detail($id)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $attendance = Attendance::where('id', $id)
-        ->where('user_id', $user->id)
-        ->firstOrFail();
+        $attendance = Attendance::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
 
-    $weeks = ['日', '月', '火', '水', '木', '金', '土'];
-    $date  = Carbon::parse($attendance->work_date);
-    $week  = $weeks[$date->dayOfWeek];
+        $weeks = ['日', '月', '火', '水', '木', '金', '土'];
+        $date  = Carbon::parse($attendance->work_date);
+        $week  = $weeks[$date->dayOfWeek];
 
-    $breaks = DB::table('breaks')
-        ->where('attendance_id', $attendance->id)
-        ->orderBy('break_start')
-        ->get();
+        $breaks = DB::table('breaks')
+            ->where('attendance_id', $attendance->id)
+            ->orderBy('break_start')
+            ->get();
 
-    $break1 = $breaks->get(0);
-    $break2 = $breaks->get(1);
+        $latestRequest = StampCorrectionRequest::query()
+            ->with(['breaks'])
+            ->where('user_id', $user->id)
+            ->where('attendance_id', $attendance->id)
+            ->latest('created_at')
+            ->first();
 
-    $latestRequest = StampCorrectionRequest::query()
-        ->where('user_id', $user->id)
-        ->where('attendance_id', $attendance->id)
-        ->latest('created_at')
-        ->first();
-
-    return view('attendance.detail', [
-        'attendance'     => $attendance,
-        'user'           => $user,
-        'date'           => $date,
-        'week'           => $week,
-        'break1'         => $break1,
-        'break2'         => $break2,
-        'latestRequest'  => $latestRequest,
-    ]);
-}
+        return view('attendance.detail', [
+            'attendance'    => $attendance,
+            'user'          => $user,
+            'date'          => $date,
+            'week'          => $week,
+            'breaks'        => $breaks,
+            'latestRequest' => $latestRequest,
+        ]);
+    }
 }

@@ -55,10 +55,11 @@
                             $targetDate = $targetRaw ? \Illuminate\Support\Carbon::parse($targetRaw)->format('Y/m/d') : '';
                             $reason = $req->remark ?? '';
                             $appliedAt = $req->created_at ? \Illuminate\Support\Carbon::parse($req->created_at)->format('Y/m/d') : '';
+                            $statusLabel = (int) $req->status === 0 ? '承認待ち' : '承認済み';
                         @endphp
 
                         <tr class="request-list-tr">
-                            <td class="request-list-td request-list-td--status">{{ $req->status }}</td>
+                            <td class="request-list-td request-list-td--status">{{ $statusLabel }}</td>
                             <td class="request-list-td request-list-td--name">{{ $userName }}</td>
                             <td class="request-list-td request-list-td--date">{{ $targetDate }}</td>
                             <td class="request-list-td request-list-td--reason">{{ $reason }}</td>

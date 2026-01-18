@@ -10,38 +10,108 @@
     @include('components.header')
 
     @php
+        use Carbon\Carbon;
+
         $fmt = function ($time) {
-            return $time ? \Carbon\Carbon::parse($time)->format('H:i') : '';
+            return $time ? Carbon::parse($time)->format('H:i') : '';
         };
 
-        $hasRequest = !empty($latestRequest);
-        $requestStatus = $hasRequest ? ($latestRequest->status ?? null) : null;
+        $attendance = $attendance ?? null;
+        $user = $user ?? null;
 
-        $isPending = $requestStatus === '承認待ち';
-        $isApproved = $requestStatus === '承認済み';
-        $canEdit = !$hasRequest || $requestStatus === '却下';
+        $statusRaw = $latestRequest->status ?? null;
+        $status = null;
 
-        $displayStart = $hasRequest ? $fmt($latestRequest->corrected_start) : $fmt($attendance->start_time);
-        $displayEnd = $hasRequest ? $fmt($latestRequest->corrected_end) : $fmt($attendance->end_time);
+        if ($statusRaw !== null) {
+            if (is_numeric($statusRaw)) {
+                $status = (int) $statusRaw;
+            } else {
+                $s = (string) $statusRaw;
+                if ($s === '承認待ち') $status = 0;
+                elseif ($s === '承認済み') $status = 1;
+                elseif ($s === '却下' || $s === '否認' || $s === '否認済み') $status = 2;
+                else $status = -1;
+            }
+        }
 
-        $displayBreak1Start = $hasRequest ? $fmt($latestRequest->break1_start ?? null) : $fmt($break1->break_start ?? null);
-        $displayBreak1End = $hasRequest ? $fmt($latestRequest->break1_end ?? null) : $fmt($break1->break_end ?? null);
+        $hasRequest = !empty($latestRequest) && $status !== null;
 
-        $displayBreak2Start = $hasRequest ? $fmt($latestRequest->break2_start ?? null) : $fmt($break2->break_start ?? null);
-        $displayBreak2End = $hasRequest ? $fmt($latestRequest->break2_end ?? null) : $fmt($break2->break_end ?? null);
+        $isPending  = $hasRequest && $status === 0;
+        $isApproved = $hasRequest && $status === 1;
+        $isRejected = $hasRequest && $status === 2;
+
+        $canEdit = !$hasRequest || $isRejected;
+
+        $displayStart = $fmt($hasRequest ? ($latestRequest->corrected_start ?? $attendance->start_time) : $attendance->start_time);
+        $displayEnd   = $fmt($hasRequest ? ($latestRequest->corrected_end ?? $attendance->end_time) : $attendance->end_time);
 
         $displayRemark = $hasRequest ? ($latestRequest->remark ?? '') : ($attendance->remark ?? '');
 
-        $vStart = old('start_time', $displayStart);
-        $vEnd = old('end_time', $displayEnd);
-
-        $vB1S = old('break1_start', $displayBreak1Start);
-        $vB1E = old('break1_end', $displayBreak1End);
-
-        $vB2S = old('break2_start', $displayBreak2Start);
-        $vB2E = old('break2_end', $displayBreak2End);
-
+        $vStart  = old('start_time', $displayStart);
+        $vEnd    = old('end_time', $displayEnd);
         $vRemark = old('remark', $displayRemark);
+
+        $attendanceBreaks = $breaks ?? collect();
+
+        $requestBreaks = collect();
+        if ($hasRequest && $latestRequest) {
+            if ($latestRequest->relationLoaded('breaks')) {
+                $requestBreaks = $latestRequest->breaks ?? collect();
+            } elseif (method_exists($latestRequest, 'breaks')) {
+                try {
+                    $requestBreaks = $latestRequest->breaks()->orderBy('sort_order')->get();
+                } catch (\Throwable $e) {
+                    $requestBreaks = collect();
+                }
+            }
+        }
+
+        $displayBreaks = ($hasRequest && $requestBreaks->count() > 0) ? $requestBreaks : $attendanceBreaks;
+
+        $maxSlots = 6;
+
+        $oldBreaks = old('breaks');
+        $rows = [];
+
+        if (is_array($oldBreaks)) {
+            foreach ($oldBreaks as $row) {
+                $rows[] = [
+                    'break_start' => $row['break_start'] ?? '',
+                    'break_end'   => $row['break_end'] ?? '',
+                ];
+            }
+        } else {
+            foreach ($displayBreaks as $b) {
+                $rows[] = [
+                    'break_start' => $fmt($b->break_start ?? null),
+                    'break_end'   => $fmt($b->break_end ?? null),
+                ];
+            }
+        }
+
+        $filledCount = 0;
+        foreach ($rows as $r) {
+            if (($r['break_start'] ?? '') !== '' || ($r['break_end'] ?? '') !== '') {
+                $filledCount++;
+            }
+        }
+
+        $initialVisible = $filledCount > 0 ? min($filledCount + 1, $maxSlots) : 2;
+
+        $formBreaks = [];
+        for ($i = 0; $i < $maxSlots; $i++) {
+            $formBreaks[] = $rows[$i] ?? ['break_start' => '', 'break_end' => ''];
+        }
+
+        $readonlyBreaks = $displayBreaks->values();
+        $readonlyCount = $readonlyBreaks->count();
+        $readonlyShowCount = $readonlyCount > 0 ? $readonlyCount : 2;
+
+        $labelFor = function (int $i) {
+            return $i === 0 ? '休憩' : '休憩' . ($i + 1);
+        };
+
+        $nbsp = "\u{00A0}";
     @endphp
 
     <div class="attendance-detail-page">
@@ -73,31 +143,43 @@
                     <div class="attendance-detail-row">
                         <div class="attendance-detail-label">出勤・退勤</div>
                         <div class="attendance-detail-value attendance-detail-value--time-range">
-                            <span class="time-text">{{ $displayStart }}</span>
-                            <span class="time-separator">〜</span>
-                            <span class="time-text">{{ $displayEnd }}</span>
-                        </div>
-                    </div>
-
-                    <div class="attendance-detail-row">
-                        <div class="attendance-detail-label">休憩</div>
-                        <div class="attendance-detail-value attendance-detail-value--time-range">
-                            <span class="time-text">{{ $displayBreak1Start }}</span>
-                            <span class="time-separator">〜</span>
-                            <span class="time-text">{{ $displayBreak1End }}</span>
-                        </div>
-                    </div>
-
-                    @if ($displayBreak2Start && $displayBreak2End)
-                        <div class="attendance-detail-row">
-                            <div class="attendance-detail-label">休憩2</div>
-                            <div class="attendance-detail-value attendance-detail-value--time-range">
-                                <span class="time-text">{{ $displayBreak2Start }}</span>
+                            @php
+                                $hasSE = ($displayStart !== '') || ($displayEnd !== '');
+                            @endphp
+                            @if ($hasSE)
+                                <span class="time-text">{{ $displayStart !== '' ? $displayStart : $nbsp }}</span>
                                 <span class="time-separator">〜</span>
-                                <span class="time-text">{{ $displayBreak2End }}</span>
+                                <span class="time-text">{{ $displayEnd !== '' ? $displayEnd : $nbsp }}</span>
+                            @else
+                                <span class="time-text">{{ $nbsp }}</span>
+                                <span class="time-text">{{ $nbsp }}</span>
+                                <span class="time-text">{{ $nbsp }}</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    @for ($i = 0; $i < $readonlyShowCount; $i++)
+                        @php
+                            $b = $readonlyBreaks->get($i);
+                            $bs = $b ? $fmt($b->break_start ?? null) : '';
+                            $be = $b ? $fmt($b->break_end ?? null) : '';
+                            $has = ($bs !== '') || ($be !== '');
+                        @endphp
+                        <div class="attendance-detail-row">
+                            <div class="attendance-detail-label">{{ $labelFor($i) }}</div>
+                            <div class="attendance-detail-value attendance-detail-value--time-range">
+                                @if ($has)
+                                    <span class="time-text">{{ $bs !== '' ? $bs : $nbsp }}</span>
+                                    <span class="time-separator">〜</span>
+                                    <span class="time-text">{{ $be !== '' ? $be : $nbsp }}</span>
+                                @else
+                                    <span class="time-text attendance-detail-placeholder" aria-hidden="true">{{ $nbsp }}</span>
+                                    <span class="time-separator attendance-detail-placeholder" aria-hidden="true">{{ $nbsp }}</span>
+                                    <span class="time-text attendance-detail-placeholder" aria-hidden="true">{{ $nbsp }}</span>
+                                @endif
                             </div>
                         </div>
-                    @endif
+                    @endfor
 
                     <div class="attendance-detail-row attendance-detail-row--remark">
                         <div class="attendance-detail-label">備考</div>
@@ -167,47 +249,34 @@
                             </div>
                         </div>
 
-                        <div class="attendance-detail-row">
-                            <div class="attendance-detail-label">休憩</div>
-                            <div class="attendance-detail-value attendance-detail-value--time-range">
-                                <span class="time-box">
-                                    <input type="time"
-                                           name="break1_start"
-                                           value="{{ $vB1S }}"
-                                           class="attendance-detail-input attendance-detail-input--time {{ $vB1S === '' ? 'is-empty' : '' }}"
-                                           step="60">
-                                </span>
-                                <span class="time-separator">〜</span>
-                                <span class="time-box">
-                                    <input type="time"
-                                           name="break1_end"
-                                           value="{{ $vB1E }}"
-                                           class="attendance-detail-input attendance-detail-input--time {{ $vB1E === '' ? 'is-empty' : '' }}"
-                                           step="60">
-                                </span>
+                        @foreach ($formBreaks as $i => $row)
+                            @php
+                                $visible = ($i + 1) <= $initialVisible;
+                                $style = $visible ? '' : 'display:none;';
+                                $bsVal = $row['break_start'] ?? '';
+                                $beVal = $row['break_end'] ?? '';
+                            @endphp
+                            <div class="attendance-detail-row js-break-row" data-break-index="{{ $i }}" style="{{ $style }}">
+                                <div class="attendance-detail-label">{{ $labelFor($i) }}</div>
+                                <div class="attendance-detail-value attendance-detail-value--time-range">
+                                    <span class="time-box">
+                                        <input type="time"
+                                               name="breaks[{{ $i }}][break_start]"
+                                               value="{{ $bsVal }}"
+                                               class="attendance-detail-input attendance-detail-input--time js-break-input {{ $bsVal === '' ? 'is-empty' : '' }}"
+                                               step="60">
+                                    </span>
+                                    <span class="time-separator">〜</span>
+                                    <span class="time-box">
+                                        <input type="time"
+                                               name="breaks[{{ $i }}][break_end]"
+                                               value="{{ $beVal }}"
+                                               class="attendance-detail-input attendance-detail-input--time js-break-input {{ $beVal === '' ? 'is-empty' : '' }}"
+                                               step="60">
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="attendance-detail-row">
-                            <div class="attendance-detail-label">休憩2</div>
-                            <div class="attendance-detail-value attendance-detail-value--time-range">
-                                <span class="time-box">
-                                    <input type="time"
-                                           name="break2_start"
-                                           value="{{ $vB2S }}"
-                                           class="attendance-detail-input attendance-detail-input--time {{ $vB2S === '' ? 'is-empty' : '' }}"
-                                           step="60">
-                                </span>
-                                <span class="time-separator">〜</span>
-                                <span class="time-box">
-                                    <input type="time"
-                                           name="break2_end"
-                                           value="{{ $vB2E }}"
-                                           class="attendance-detail-input attendance-detail-input--time {{ $vB2E === '' ? 'is-empty' : '' }}"
-                                           step="60">
-                                </span>
-                            </div>
-                        </div>
+                        @endforeach
 
                         <div class="attendance-detail-row attendance-detail-row--remark">
                             <div class="attendance-detail-label">備考</div>
@@ -234,7 +303,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             const timeInputs = document.querySelectorAll('.attendance-detail-input--time');
 
-            const sync = (el) => {
+            const syncEmpty = (el) => {
                 if (el.value && el.value.trim() !== '') {
                     el.classList.remove('is-empty');
                 } else {
@@ -243,10 +312,64 @@
             };
 
             timeInputs.forEach((el) => {
-                sync(el);
-                el.addEventListener('input', () => sync(el));
-                el.addEventListener('change', () => sync(el));
-                el.addEventListener('blur', () => sync(el));
+                syncEmpty(el);
+                el.addEventListener('input', () => syncEmpty(el));
+                el.addEventListener('change', () => syncEmpty(el));
+                el.addEventListener('blur', () => syncEmpty(el));
+            });
+
+            const rows = Array.from(document.querySelectorAll('.js-break-row'));
+            const inputs = Array.from(document.querySelectorAll('.js-break-input'));
+
+            const rowHasValue = (row) => {
+                const ins = row.querySelectorAll('input[type="time"]');
+                for (const i of ins) {
+                    if (i.value && i.value.trim() !== '') return true;
+                }
+                return false;
+            };
+
+            const revealUpTo = (index) => {
+                rows.forEach((r) => {
+                    const i = parseInt(r.dataset.breakIndex || '0', 10);
+                    if (i <= index) r.style.display = '';
+                });
+            };
+
+            let lastFilled = -1;
+            rows.forEach((r) => {
+                const i = parseInt(r.dataset.breakIndex || '0', 10);
+                if (rowHasValue(r)) lastFilled = Math.max(lastFilled, i);
+            });
+
+            if (lastFilled >= 0) {
+                revealUpTo(Math.min(lastFilled + 1, rows.length - 1));
+            }
+
+            const ensureNextRow = () => {
+                let maxVisible = -1;
+                rows.forEach((r) => {
+                    const i = parseInt(r.dataset.breakIndex || '0', 10);
+                    if (r.style.display !== 'none') maxVisible = Math.max(maxVisible, i);
+                });
+
+                if (maxVisible < 0) return;
+
+                const visibleRows = rows.filter(r => r.style.display !== 'none');
+                const lastRow = visibleRows[visibleRows.length - 1];
+
+                if (lastRow && rowHasValue(lastRow)) {
+                    const nextIndex = maxVisible + 1;
+                    if (rows[nextIndex]) {
+                        rows[nextIndex].style.display = '';
+                    }
+                }
+            };
+
+            inputs.forEach((el) => {
+                el.addEventListener('input', ensureNextRow);
+                el.addEventListener('change', ensureNextRow);
+                el.addEventListener('blur', ensureNextRow);
             });
         });
     </script>

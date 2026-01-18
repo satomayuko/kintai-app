@@ -11,6 +11,7 @@ class AdminStaffController extends Controller
     {
         $staffs = User::query()
             ->select('id', 'name', 'email')
+            ->where('email', '!=', 'admin@example.com')
             ->orderBy('id')
             ->get();
 

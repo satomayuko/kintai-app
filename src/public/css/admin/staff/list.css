@@ -6,14 +6,14 @@
 .admin-staff-list__inner {
     width: 900px;
     margin: 0 auto;
-    padding-top: 206px;
+    padding-top: 126px;
 }
 
 .admin-staff-list__title-area {
     display: flex;
     align-items: center;
     gap: 21px;
-    margin-bottom: 104px;
+    margin: 0 0 104px 0;
 }
 
 .admin-staff-list__title-bar {
@@ -92,7 +92,7 @@
 @media (min-width: 1400px) and (max-width: 1540px) {
     .admin-staff-list__inner {
         width: 980px;
-        padding-top: 220px;
+        padding-top: 140px;
     }
 
     .admin-staff-list__title {
@@ -100,14 +100,14 @@
     }
 
     .admin-staff-list__title-area {
-        margin-bottom: 112px;
+        margin: 0 0 112px 0;
     }
 }
 
 @media (min-width: 768px) and (max-width: 850px) {
     .admin-staff-list__inner {
         width: 100%;
-        padding-top: 140px;
+        padding-top: 120px;
         padding-left: 20px;
         padding-right: 20px;
         box-sizing: border-box;
@@ -118,7 +118,7 @@
     }
 
     .admin-staff-list__title-area {
-        margin-bottom: 72px;
+        margin: 0 0 72px 0;
     }
 
     .admin-staff-list__th,

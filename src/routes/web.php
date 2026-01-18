@@ -67,7 +67,7 @@ Route::prefix('admin')->name('admin.')->middleware('fortify.admin')->group(funct
     Route::middleware('auth:admin')->group(function () {
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
 
-        Route::get('/attendance/list', [AdminAttendanceController::class, 'daily'])->name('attendance.list');
+        Route::get('/attendance/list', [AdminAttendanceController::class, 'list'])->name('attendance.list');
 
         Route::get('/attendance/{id}', [AdminAttendanceController::class, 'detail'])
             ->whereNumber('id')

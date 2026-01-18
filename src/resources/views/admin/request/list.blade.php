@@ -12,6 +12,7 @@
 @php
     $currentTab = $tab ?? request('tab', 'pending');
     $requests = $currentTab === 'approved' ? ($approvedRequests ?? collect()) : ($pendingRequests ?? collect());
+    $statusLabels = [0 => '承認待ち', 1 => '承認済み', 2 => '却下'];
 @endphp
 
 <div class="request-list-page">
@@ -58,10 +59,12 @@
 
                             $detailRouteName = 'admin.stamp_correction_request.approve.form';
                             $detailParams = ['attendance_correct_request_id' => $req->id];
+
+                            $statusText = $statusLabels[(int) ($req->status ?? -1)] ?? '-';
                         @endphp
 
                         <tr class="request-list-tr">
-                            <td class="request-list-td request-list-td--status">{{ $req->status }}</td>
+                            <td class="request-list-td request-list-td--status">{{ $statusText }}</td>
                             <td class="request-list-td request-list-td--name">{{ $userName }}</td>
                             <td class="request-list-td request-list-td--date">{{ $targetDate }}</td>
                             <td class="request-list-td request-list-td--reason">{{ $reason }}</td>

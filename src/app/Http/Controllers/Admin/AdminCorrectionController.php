@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\StampCorrectionRequest;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -39,7 +39,7 @@ class AdminCorrectionController extends Controller
     public function approveForm(int $attendance_correct_request_id): View
     {
         $correctionRequest = StampCorrectionRequest::query()
-            ->with(['user', 'attendance.breaks'])
+            ->with(['user', 'attendance.breaks', 'breaks'])
             ->findOrFail($attendance_correct_request_id);
 
         return view('admin.request.approve', compact('correctionRequest'));
@@ -48,7 +48,7 @@ class AdminCorrectionController extends Controller
     public function approve(Request $request, int $attendance_correct_request_id): RedirectResponse|JsonResponse
     {
         $correctionRequest = StampCorrectionRequest::query()
-            ->with(['attendance.breaks'])
+            ->with(['attendance.breaks', 'breaks'])
             ->findOrFail($attendance_correct_request_id);
 
         if ((int) $correctionRequest->status !== 0) {
@@ -61,18 +61,6 @@ class AdminCorrectionController extends Controller
 
         DB::transaction(function () use ($correctionRequest) {
             $attendance = $correctionRequest->attendance;
-            $workDate = Carbon::parse($attendance->work_date ?? now())->toDateString();
-
-            $toDateTimeString = function ($value) use ($workDate): ?string {
-                if ($value === null || $value === '') {
-                    return null;
-                }
-                $v = trim((string) $value);
-                if (str_contains($v, '-')) {
-                    return Carbon::parse($v)->format('Y-m-d H:i:s');
-                }
-                return Carbon::parse($workDate . ' ' . $v)->format('Y-m-d H:i:s');
-            };
 
             $attendance->fill([
                 'start_time' => $correctionRequest->corrected_start ?? $attendance->start_time,
@@ -80,34 +68,34 @@ class AdminCorrectionController extends Controller
                 'remark'     => $correctionRequest->remark ?? $attendance->remark,
             ])->save();
 
-            $breaks = $attendance->breaks->values();
-            $break1 = $breaks->get(0);
-            $break2 = $breaks->get(1);
+            DB::table('breaks')->where('attendance_id', $attendance->id)->delete();
 
-            if (!is_null($correctionRequest->break1_start) || !is_null($correctionRequest->break1_end)) {
-                $payload = [
-                    'break_start' => $toDateTimeString($correctionRequest->break1_start),
-                    'break_end'   => $toDateTimeString($correctionRequest->break1_end),
-                ];
+            $workDate = Carbon::parse($attendance->work_date ?? now())->toDateString();
 
-                if ($break1) {
-                    $break1->update($payload);
-                } else {
-                    $attendance->breaks()->create($payload);
+            $toDateTimeString = function ($value) use ($workDate): ?string {
+                if ($value === null || $value === '') {
+                    return null;
                 }
-            }
 
-            if (!is_null($correctionRequest->break2_start) || !is_null($correctionRequest->break2_end)) {
-                $payload = [
-                    'break_start' => $toDateTimeString($correctionRequest->break2_start),
-                    'break_end'   => $toDateTimeString($correctionRequest->break2_end),
-                ];
+                $v = trim((string) $value);
 
-                if ($break2) {
-                    $break2->update($payload);
-                } else {
-                    $attendance->breaks()->create($payload);
+                if (str_contains($v, '-')) {
+                    return Carbon::parse($v)->format('Y-m-d H:i:s');
                 }
+
+                return Carbon::parse($workDate . ' ' . $v)->format('Y-m-d H:i:s');
+            };
+
+            $requestBreaks = $correctionRequest->breaks->values();
+
+            foreach ($requestBreaks as $b) {
+                DB::table('breaks')->insert([
+                    'attendance_id' => $attendance->id,
+                    'break_start'   => $toDateTimeString($b->break_start),
+                    'break_end'     => $toDateTimeString($b->break_end),
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
+                ]);
             }
 
             $correctionRequest->update(['status' => 1]);

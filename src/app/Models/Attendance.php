@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 
@@ -32,7 +33,8 @@ class Attendance extends Model
 
     public function breaks()
     {
-        return $this->hasMany(WorkBreak::class, 'attendance_id');
+        return $this->hasMany(\App\Models\WorkBreak::class, 'attendance_id')
+            ->orderBy('break_start');
     }
 
     public function correctionRequests()

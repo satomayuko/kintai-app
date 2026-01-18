@@ -18,23 +18,45 @@
 
     $workDate = Carbon::parse($attendance->work_date ?? now());
 
-    $formatDash  = fn($t) => $t ? Carbon::parse($t)->format('H:i') : '-';
-    $formatEmpty = fn($t) => $t ? Carbon::parse($t)->format('H:i') : '';
+    $formatDash = fn ($t) => $t ? Carbon::parse($t)->format('H:i') : '-';
 
     $start = $formatDash($correctionRequest->corrected_start ?? $attendance->start_time);
     $end   = $formatDash($correctionRequest->corrected_end ?? $attendance->end_time);
 
-    $break1Start = $formatEmpty($correctionRequest->break1_start);
-    $break1End   = $formatEmpty($correctionRequest->break1_end);
-    $break2Start = $formatEmpty($correctionRequest->break2_start);
-    $break2End   = $formatEmpty($correctionRequest->break2_end);
+    $reqBreaks = $correctionRequest->relationLoaded('breaks')
+        ? $correctionRequest->breaks->sortBy('sort_order')->values()
+        : $correctionRequest->breaks()->orderBy('sort_order')->get()->values();
 
-    $hasBreak1 = ($break1Start !== '') || ($break1End !== '');
-    $hasBreak2 = ($break2Start !== '') || ($break2End !== '');
+    $filledBreaks = $reqBreaks
+        ->filter(fn ($b) => !is_null($b->break_start) || !is_null($b->break_end))
+        ->values();
 
-    $remark = $correctionRequest->remark ?? $attendance->remark;
+    if ($filledBreaks->isEmpty()) {
+        $breakSlots = collect([
+            ['label' => '休憩',  'start' => '00:00', 'end' => '00:00', 'has' => false],
+            ['label' => '休憩2', 'start' => '00:00', 'end' => '00:00', 'has' => false],
+        ]);
+    } else {
+        $breakSlots = $filledBreaks->map(function ($b, $idx) use ($formatDash) {
+            $i = $idx + 1;
+            $bs = $b->break_start ?? null;
+            $be = $b->break_end ?? null;
+
+            return [
+                'label' => $i === 1 ? '休憩' : "休憩{$i}",
+                'start' => $formatDash($bs),
+                'end'   => $formatDash($be),
+                'has'   => true,
+            ];
+        });
+    }
+
+    $remark = $correctionRequest->remark ?? $attendance->remark ?? '';
 
     $approveParam = ['attendance_correct_request_id' => $correctionRequest->id];
+
+    $statusRaw = $correctionRequest->status;
+    $isApproved = ((string) $statusRaw === '承認済み') || ((int) $statusRaw === 1);
 @endphp
 
 <div class="attendance-detail-page admin-approve">
@@ -77,37 +99,23 @@
                 <div></div>
             </div>
 
-            <div class="attendance-detail-row">
-                <div class="attendance-detail-label">休憩</div>
-                <div class="attendance-detail-value attendance-detail-value--time-range">
-                    @if($hasBreak1)
-                        <span class="time-text">{{ $break1Start !== '' ? $break1Start : '-' }}</span>
-                        <span class="time-separator">〜</span>
-                        <span class="time-text">{{ $break1End !== '' ? $break1End : '-' }}</span>
-                    @else
-                        <span class="time-text attendance-detail-placeholder" aria-hidden="true">00:00</span>
-                        <span class="time-separator attendance-detail-placeholder" aria-hidden="true">〜</span>
-                        <span class="time-text attendance-detail-placeholder" aria-hidden="true">00:00</span>
-                    @endif
+            @foreach($breakSlots as $slot)
+                <div class="attendance-detail-row">
+                    <div class="attendance-detail-label">{{ $slot['label'] }}</div>
+                    <div class="attendance-detail-value attendance-detail-value--time-range">
+                        @if($slot['has'])
+                            <span class="time-text">{{ $slot['start'] }}</span>
+                            <span class="time-separator">〜</span>
+                            <span class="time-text">{{ $slot['end'] }}</span>
+                        @else
+                            <span class="time-text attendance-detail-placeholder" aria-hidden="true">00:00</span>
+                            <span class="time-separator attendance-detail-placeholder" aria-hidden="true">〜</span>
+                            <span class="time-text attendance-detail-placeholder" aria-hidden="true">00:00</span>
+                        @endif
+                    </div>
+                    <div></div>
                 </div>
-                <div></div>
-            </div>
-
-            <div class="attendance-detail-row">
-                <div class="attendance-detail-label">休憩2</div>
-                <div class="attendance-detail-value attendance-detail-value--time-range">
-                    @if($hasBreak2)
-                        <span class="time-text">{{ $break2Start !== '' ? $break2Start : '-' }}</span>
-                        <span class="time-separator">〜</span>
-                        <span class="time-text">{{ $break2End !== '' ? $break2End : '-' }}</span>
-                    @else
-                        <span class="time-text attendance-detail-placeholder" aria-hidden="true">00:00</span>
-                        <span class="time-separator attendance-detail-placeholder" aria-hidden="true">〜</span>
-                        <span class="time-text attendance-detail-placeholder" aria-hidden="true">00:00</span>
-                    @endif
-                </div>
-                <div></div>
-            </div>
+            @endforeach
 
             <div class="attendance-detail-row attendance-detail-row--remark">
                 <div class="attendance-detail-label">備考</div>
@@ -122,7 +130,7 @@
         </div>
 
         <div class="attendance-detail-footer">
-            @if($correctionRequest->status === '承認済み')
+            @if($isApproved)
                 <button class="attendance-detail-edit-button is-disabled" disabled>承認済み</button>
             @else
                 <form action="{{ route('admin.stamp_correction_request.approve', $approveParam) }}" method="POST">
