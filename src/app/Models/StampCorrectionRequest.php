@@ -10,18 +10,17 @@ class StampCorrectionRequest extends Model
     use HasFactory;
 
     protected $fillable = [
-    'user_id',
-    'attendance_id',
-    'corrected_start',
-    'corrected_end',
-    'break1_start',
-    'break1_end',
-    'break2_start',
-    'break2_end',
-    'remark',
-    'status',
-];
-
+        'user_id',
+        'attendance_id',
+        'corrected_start',
+        'corrected_end',
+        'break1_start',
+        'break1_end',
+        'break2_start',
+        'break2_end',
+        'remark',
+        'status',
+    ];
 
     public function user()
     {
@@ -32,4 +31,8 @@ class StampCorrectionRequest extends Model
     {
         return $this->belongsTo(Attendance::class);
     }
+
+    protected $casts = [
+        'status' => 'integer',
+    ];
 }

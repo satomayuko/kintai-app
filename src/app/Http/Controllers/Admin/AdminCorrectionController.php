@@ -21,8 +21,8 @@ class AdminCorrectionController extends Controller
             ->with(['user', 'attendance'])
             ->orderByDesc('created_at');
 
-        $pendingRequests = (clone $base)->where('status', '承認待ち')->get();
-        $approvedRequests = (clone $base)->where('status', '承認済み')->get();
+        $pendingRequests  = (clone $base)->where('status', 0)->get();
+        $approvedRequests = (clone $base)->where('status', 1)->get();
 
         return view('admin.request.list', compact('tab', 'pendingRequests', 'approvedRequests'));
     }
@@ -51,7 +51,7 @@ class AdminCorrectionController extends Controller
             ->with(['attendance.breaks'])
             ->findOrFail($attendance_correct_request_id);
 
-        if ($correctionRequest->status !== '承認待ち') {
+        if ((int) $correctionRequest->status !== 0) {
             if ($request->expectsJson()) {
                 return response()->json(['ok' => false], 422);
             }
@@ -110,13 +110,13 @@ class AdminCorrectionController extends Controller
                 }
             }
 
-            $correctionRequest->update(['status' => '承認済み']);
+            $correctionRequest->update(['status' => 1]);
         });
 
         if ($request->expectsJson()) {
             return response()->json([
                 'ok' => true,
-                'status' => '承認済み',
+                'status' => 1,
             ]);
         }
 

@@ -18,8 +18,8 @@ class StampCorrectionRequestController extends Controller
             ->with(['user', 'attendance'])
             ->orderByDesc('created_at');
 
-        $pendingRequests = (clone $base)->where('status', '承認待ち')->get();
-        $approvedRequests = (clone $base)->where('status', '承認済み')->get();
+        $pendingRequests = (clone $base)->where('status', 0)->get();
+        $approvedRequests = (clone $base)->where('status', 1)->get();
 
         return view('stamp_correction_request.list', compact('tab', 'pendingRequests', 'approvedRequests'));
     }
@@ -45,7 +45,7 @@ class StampCorrectionRequestController extends Controller
         $alreadyPending = StampCorrectionRequestModel::query()
             ->where('user_id', $user->id)
             ->where('attendance_id', $attendanceId)
-            ->where('status', '承認待ち')
+            ->where('status', 0)
             ->exists();
 
         if ($alreadyPending) {
@@ -64,7 +64,7 @@ class StampCorrectionRequestController extends Controller
             'break2_start' => $this->toTimeOrNull($validated['break2_start'] ?? null),
             'break2_end' => $this->toTimeOrNull($validated['break2_end'] ?? null),
             'remark' => $validated['remark'],
-            'status' => '承認待ち',
+            'status' => 0,
         ]);
 
         return redirect()
