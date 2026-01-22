@@ -63,17 +63,21 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 ※ php artisan migrate:fresh --seed 実行後に利用できます。
 
-管理者
+### 管理者
+- name : 管理者
 - email : admin@example.com
 - password : password123
----
-一般ユーザー
+
+### 一般ユーザー
+- name : テスト太郎
 - email : taro@example.com
 - password : password123
----
+
+- name : テスト花子
 - email : hanako@example.com
 - password : password123
----
+
+- name : テスト次郎
 - email : jiro@example.com
 - password : password123
 
