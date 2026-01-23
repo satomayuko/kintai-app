@@ -1,9 +1,13 @@
 <header class="header">
     <div class="header__logo">
         @if (request()->is('admin*'))
-            <a href="{{ route('admin.attendance.list') }}"><img src="{{ asset('img/logo.png') }}" alt="ロゴ"></a>
+            <a href="{{ route('admin.attendance.list') }}">
+                <img src="{{ asset('img/logo.png') }}" alt="kintai-app">
+            </a>
         @else
-            <a href="{{ route('attendance.index') }}"><img src="{{ asset('img/logo.png') }}" alt="ロゴ"></a>
+            <a href="{{ route('attendance.index') }}">
+                <img src="{{ asset('img/logo.png') }}" alt="kintai-app">
+            </a>
         @endif
     </div>
 
@@ -18,7 +22,7 @@
 
     @unless($hideNav)
         @if (request()->is('admin*') && \Illuminate\Support\Facades\Auth::guard('admin')->check())
-            <nav class="header__nav">
+            <nav class="header__nav" aria-label="管理者メニュー">
                 <ul>
                     <li><a href="{{ route('admin.attendance.list') }}">勤怠一覧</a></li>
                     @if (\Illuminate\Support\Facades\Route::has('admin.staff.list'))
@@ -34,7 +38,7 @@
                 </ul>
             </nav>
         @elseif (!request()->is('admin*') && \Illuminate\Support\Facades\Auth::guard('web')->check())
-            <nav class="header__nav">
+            <nav class="header__nav" aria-label="メニュー">
                 <ul>
                     @if (!empty($finished) && $finished)
                         <li><a href="{{ route('stamp_correction_request.list', ['today' => 1]) }}">今日の申請一覧</a></li>

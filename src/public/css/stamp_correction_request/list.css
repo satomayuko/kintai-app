@@ -34,11 +34,22 @@
 }
 
 .request-list-tabs {
+    margin-top: 72px;
+}
+
+.request-list-tabs-list {
     display: flex;
     align-items: center;
     gap: 106px;
-    margin-top: 72px;
     flex-wrap: wrap;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.request-list-tabs-item {
+    margin: 0;
+    padding: 0;
 }
 
 .request-list-tab {
@@ -50,6 +61,7 @@
     text-decoration: none;
     font-weight: 400;
     padding-bottom: 18px;
+    display: inline-block;
 }
 
 .request-list-tab.is-active {
@@ -139,8 +151,11 @@
     }
 
     .request-list-tabs {
-        gap: 120px;
         margin-top: 80px;
+    }
+
+    .request-list-tabs-list {
+        gap: 120px;
     }
 
     .request-list-table-wrap {
@@ -163,8 +178,11 @@
     }
 
     .request-list-tabs {
-        gap: 48px;
         margin-top: 56px;
+    }
+
+    .request-list-tabs-list {
+        gap: 48px;
     }
 
     .request-list-tab {
