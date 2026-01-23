@@ -116,7 +116,7 @@ php artisan migrate:fresh --env=testing
 | created_at | timestamp |  |  |  |  |
 | updated_at | timestamp |  |  |  |  |
 
-### attendances
+### attendancesテーブル
 ※ UNIQUE(user_id, work_date)
 
 | カラム名 | 型 | PK | UK | NOT NULL | FK |
