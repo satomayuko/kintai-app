@@ -12,9 +12,8 @@ class CreateNewUser implements CreatesNewUsers
 {
     public function create(array $input): User
     {
-        // RegisterRequest の要件に合わせる
         $rules = [
-            'name' => ['required', 'string', 'max:20'],  // ← 修正！20文字
+            'name' => ['required', 'string', 'max:20'],
             'email' => [
                 'required',
                 'string',

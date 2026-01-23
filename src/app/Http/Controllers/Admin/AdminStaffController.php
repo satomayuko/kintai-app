@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\View\View;
 
 class AdminStaffController extends Controller
 {
-    public function list()
+    public function list(): View
     {
         $staffs = User::query()
             ->select('id', 'name', 'email')
